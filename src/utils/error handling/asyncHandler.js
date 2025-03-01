@@ -1,4 +1,4 @@
-export const asyncHandler = (fn) => {
+const asyncHandler = (fn) => {
     return (req, res, next) => {
         fn(req, res, next).catch((error) => {
             if (Object.keys(error) === 0) {
@@ -8,3 +8,5 @@ export const asyncHandler = (fn) => {
         });
     }
 }
+
+export default asyncHandler;

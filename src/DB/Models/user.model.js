@@ -25,7 +25,7 @@ const userSchema = new Schema(
             default: enumTypes.roleType.User,
         },
 
-        DOB: { type: Date, required: true },
+        DOB: { type: Date },
         mobileNumber: { type: String },
         isConfirmed: { type: Boolean, default: false },
         deletedAt: { type: Date },
@@ -63,7 +63,7 @@ userSchema.pre("save", function (next) {
 // Indexing for performance
 userSchema.index({ email: 1 }, { unique: true });
 
-const UserModel = model("User", userSchema);
+const UserModel = mongoose.model("User", userSchema);
 
 export default UserModel;
 
