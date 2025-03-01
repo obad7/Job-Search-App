@@ -26,5 +26,4 @@ export const updateProfile = async (req, res, next) => {
         data: { user },
     });
 
-    return res.status(200).json({ success: true });
 };

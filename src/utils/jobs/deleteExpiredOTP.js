@@ -6,7 +6,7 @@ const deleteExpiredOTPs = async () => {
     try {
         const result = await OTPModel.deleteMany({
             // Delete OTPs older than 10 minutes
-            createdAt: { $lt: new Date(Date.now() - 3 * 60 * 1000) },
+            createdAt: { $lt: new Date(Date.now() - 10 * 60 * 1000) },
         });
     } catch (error) {
         console.error("Error deleting expired OTPs:", error);
