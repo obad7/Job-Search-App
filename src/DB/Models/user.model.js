@@ -5,8 +5,8 @@ import * as enumTypes from "../enumTypes.js";
 
 const userSchema = new Schema(
     {
-        firstName: { type: String, required: true },
-        lastName: { type: String, required: true },
+        firstName: { type: String },
+        lastName: { type: String },
         email: { type: String, required: true, unique: true, lowercase: true, trim: true },
         password: { type: String, required: true },
 
