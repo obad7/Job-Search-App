@@ -18,3 +18,8 @@ export const OTPType = {
     confirmEmail: "confirmEmail",
     forgetPassword: "forgetPassword",
 };
+
+export const tokenType = {
+    access: "access",
+    refresh: "refresh",
+};

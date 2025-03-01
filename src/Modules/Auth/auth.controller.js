@@ -3,6 +3,7 @@ import asyncHandler from "../../utils/error handling/asyncHandler.js";
 import * as authService from "./auth.service.js";
 import { validation } from "../../Middlewares/validation.middleware.js";
 import * as authValidation from "./auth.validation.js";
+import { authentication, allowTo } from "../../Middlewares/auth.middleware.js";
 
 const router = Router();
 
