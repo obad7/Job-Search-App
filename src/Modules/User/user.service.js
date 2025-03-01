@@ -1,7 +1,5 @@
 import * as dbService from "../../DB/dbService.js";
 import UserModel from "../../DB/Models/user.model.js";
-import { emailEmitter } from "../../utils/emails/emailEvents.js";
-import * as enumTypes from "../../DB/enumTypes.js";
 import { encrypt } from "../../utils/encryption/encryption.js";
 
 
@@ -26,4 +24,18 @@ export const updateProfile = async (req, res, next) => {
         data: { user },
     });
 
+};
+
+export const getProfile = async (req, res, next) => {
+
+    const user = await dbService.findOne({
+        model: UserModel,
+        filter: { _id: req.user._id }
+    });
+    if (!user) return next(new Error("User not found", { cause: 400 }));
+
+    return res.status(200).json({
+        success: true,
+        data: { user },
+    });
 };

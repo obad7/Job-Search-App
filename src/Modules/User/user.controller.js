@@ -15,4 +15,11 @@ router.patch(
     asyncHandler(userService.updateProfile),
 );
 
+router.get(
+    "/getProfile",
+    authentication(),
+    allowTo(["User"]),
+    asyncHandler(userService.getProfile),
+);
+
 export default router;

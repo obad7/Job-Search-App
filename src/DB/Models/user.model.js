@@ -1,6 +1,7 @@
 import mongoose, { Schema, model, Types } from "mongoose";
 import { hash } from "../../utils/hashing/hash.js";
 import * as enumTypes from "../enumTypes.js";
+import { decrypt } from "../../utils/encryption/encryption.js";
 
 
 const userSchema = new Schema(
@@ -52,6 +53,16 @@ userSchema.pre("save", function (next) {
         this.password = hash({ plainText: this.password });
     }
     next();
+});
+
+// Encrypt mobile number
+userSchema.post("findOne", function (doc) {
+    if (doc) {
+        doc.mobileNumber = decrypt({
+            encrypted: doc.mobileNumber,
+            signature: process.env.ENCRYPTION_KEY
+        });
+    }
 });
 
 
