@@ -1,6 +1,7 @@
 import connectDB from "./DB/connection.js";
 import authRouter from "./Modules/Auth/auth.controller.js";
 import { notFoundHandler, globalErrorHandler } from "./utils/error handling/globalErrorHandler.js";
+import "./utils/jobs/deleteExpiredOTP.js";
 
 const bootstrap = async (app, express) => {
     await connectDB();
