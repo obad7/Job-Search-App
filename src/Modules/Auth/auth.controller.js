@@ -37,4 +37,9 @@ router.patch(
     asyncHandler(authService.resetPassword),
 );
 
+// refresh token
+router.get(
+    "/refresh_token",
+    asyncHandler(authService.refresh_token)
+);
 export default router;

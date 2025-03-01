@@ -5,5 +5,5 @@ export const generateToken = ({ payload, signature, options = {} }) => {
 };
 
 export const verifyToken = ({ token, signature }) => {
-    return jwt.verify( token, signature );
+    return jwt.verify(token, signature);
 };

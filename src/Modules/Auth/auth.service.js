@@ -5,6 +5,7 @@ import * as enumTypes from "../../DB/enumTypes.js";
 import { compareHash } from "../../utils/hashing/hash.js";
 import { generateToken } from "../../utils/token/token.js";
 import OTPModel from "../../DB/Models/OTP.model.js";
+import { decodedToken } from "../../Middlewares/auth.middleware.js";
 
 export const signUp = async (req, res, next) => {
     const { firstName, lastName, email, password } = req.body;
@@ -24,7 +25,7 @@ export const signUp = async (req, res, next) => {
         success: true,
         message: newUser,
     });
-}
+};
 
 export const confirmOTP = async (req, res, next) => {
     const { email, otp } = req.body;
@@ -96,7 +97,7 @@ export const signIn = async (req, res, next) => {
             refreshToken: refreshToken,
         },
     });
-}
+};
 
 
 export const forgetPasswordOTP = async (req, res, next) => {
@@ -111,7 +112,7 @@ export const forgetPasswordOTP = async (req, res, next) => {
         success: true,
         message: "email sent successfully",
     });
-}
+};
 
 
 export const resetPassword = async (req, res, next) => {
@@ -148,4 +149,36 @@ export const resetPassword = async (req, res, next) => {
     });
 };
 
+export const refresh_token = async (req, res, next) => {
+    const { authorization } = req.headers;
+    const user = await decodedToken({
+        authorization,
+        tokenType: enumTypes.tokenType.refresh,
+        next: next
+    });
+
+    const accessToken = generateToken({
+        payload: { id: user._id },
+        signature:
+            user.role === enumTypes.roleType.User
+                ? process.env.USER_ACCESS_TOKEN
+                : process.env.ADMIN_ACCESS_TOKEN,
+    });
+
+    const refreshToken = generateToken({
+        payload: { id: user._id },
+        signature:
+            user.role === enumTypes.roleType.User
+                ? process.env.USER_REFRESH_TOKEN
+                : process.env.ADMIN_REFRESH_TOKEN,
+    });
+
+    return res.status(200).json({
+        success: true,
+        tokens: {
+            accessToken: accessToken,
+            refreshToken: refreshToken,
+        },
+    });
+};
 

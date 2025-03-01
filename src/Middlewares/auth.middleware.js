@@ -39,14 +39,15 @@ export const decodedToken = async ({
             tokenType === enumTypes.tokenType.access ? ACCESS_SIGTATURE : REFRESH_SIGTATURE,
     });
 
+
     const user = await dbService.findOne({
         model: UserModel,
-        filter: { _id: decoded.id, isDeleted: false }
+        filter: { _id: decoded.id, deletedAt: null },
     });
     if (!user) return next(new Error("User not found", { cause: 400 }));
 
     // check if token is expired
-    if (user.changeCredentials?.getTime() >= decoded.iat * 1000)
+    if (user.changeCredentialTime?.getTime() >= decoded.iat * 1000)
         return next(new Error("Token expired", { cause: 401 }));
 
     return user;
