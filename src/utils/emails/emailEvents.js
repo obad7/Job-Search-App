@@ -1,9 +1,9 @@
 import * as dbService from "../../DB/dbService.js";
-import { EventEmitter } from "events"
+import { EventEmitter } from "events";
 import sendEmail, { subject } from "./sendEmail.js";
 import { signUpHTML } from "./generateHTML.js";
 import { customAlphabet } from "nanoid";
-import UserModel from "../../DB/Models/user.model.js";
+import OTPModel from "../../DB/Models/OTP.model.js";
 import { hash } from './../hashing/hash.js';
 import * as enumTypes from "../../DB/enumTypes.js";
 
@@ -31,59 +31,49 @@ emailEmitter.on("updateEmail", async (email, userName, id) => {
 });
 
 
-//This code generates a 6-digit One-Time Password (OTP), hashes it, 
-// and updates a user's document in the database with the hashed OTP. 
-// then sends an email to the user with the OTP and a subject line 
-// based on the subjectType parameter, which can be one of three 
-// types: verify email, reset password, or update email.
-export const sendCode = async ({
-    data = {},
-    subjectType = subject.verifyEmail,
-}) => {
+//Generates a new OTP, hashes it, stores it in the `OTPModel`, and sends an email.
+export const sendCode = async ({ data = {}, subjectType = subject.verifyEmail }) => {
     try {
         const { userName, email, id } = data;
 
+        // Generate a 6-digit OTP
         const otp = customAlphabet('0123456789', 6)();
         const hashedOtp = hash({ plainText: otp });
 
-        let updateData = {};
-
+        let otpType;
         switch (subjectType) {
             case subject.verifyEmail:
-                updateData = {
-                    OTP: [
-                        {
-                            code: hashedOtp,
-                            type: enumTypes.OTPType.confirmEmail,
-                            createdAt: new Date(),
-                        }
-                    ],
-                };
-            //     break;
-            // case subject.resetPassword:
-            //     updateData = { forgetPasswordOTP: hashedOtp };
-            //     break;
-            // case subject.updateEmail:
-            //     updateData = { tampEmailOTP: hashedOtp };
-            //     break;
-            // default:
-            //     break;
+                otpType = enumTypes.OTPType.confirmEmail;
+                break;
+            case subject.resetPassword:
+                otpType = enumTypes.OTPType.forgetPassword;
+                break;
+            case subject.updateEmail:
+                otpType = enumTypes.OTPType.updateEmail;
+                break;
+            default:
+                throw new Error("Invalid OTP Type");
         }
 
-        await dbService.updateOne({
-            model: UserModel,
-            filter: { _id: id },
-            data: { ...updateData },
+        // Remove any existing OTPs for this user and type before inserting a new one
+        await OTPModel.deleteMany({ userId: id, type: otpType });
+
+        // Save the new OTP in the OTPModel
+        await OTPModel.create({
+            userId: id,
+            code: hashedOtp,
+            type: otpType,
+            createdAt: new Date(),
         });
 
-        const isSent = await sendEmail({
+        // Send email with the OTP
+        await sendEmail({
             to: email,
             subject: subjectType,
-            html: signUpHTML(otp, userName, subjectType)
+            html: signUpHTML(otp, userName, subjectType),
         });
 
     } catch (error) {
-        console.log(error);
+        console.log("Error sending OTP:", error);
     }
-
 };

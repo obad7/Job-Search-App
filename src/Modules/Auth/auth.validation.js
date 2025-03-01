@@ -22,3 +22,14 @@ export const signInSchema = joi.object({
     email: generalFaileds.email.required(),
     password: generalFaileds.password.required(),
 }).required();
+
+export const forgetPasswordSchema = joi.object({
+    email: generalFaileds.email.required(),
+}).required();
+
+export const resetPasswordSchema = joi.object({
+    email: generalFaileds.email.required(),
+    otp: generalFaileds.code.required(),
+    password: generalFaileds.password.required(),
+    confirmPassword: generalFaileds.confirmPassword.required(),
+}).required();

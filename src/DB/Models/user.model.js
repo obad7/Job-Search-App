@@ -2,14 +2,6 @@ import mongoose, { Schema, model, Types } from "mongoose";
 import { hash } from "../../utils/hashing/hash.js";
 import * as enumTypes from "../enumTypes.js";
 
-const OTPSchema = new Schema(
-    {
-        code: { type: String, required: true },
-        type: { type: String, enum: Object.values(enumTypes.OTPType) },
-        createdAt: { type: Date, default: Date.now, expires: 600 }, // 10 min expiry
-    },
-    { _id: false } // Prevents MongoDB from creating a separate ID for each OTP
-);
 
 const userSchema = new Schema(
     {
@@ -37,18 +29,17 @@ const userSchema = new Schema(
         DOB: { type: Date },
         mobileNumber: { type: String },
         isConfirmed: { type: Boolean, default: false },
-        deletedAt: { type: Date },
-        bannedAt: { type: Date },
+        deletedAt: { type: Date, default: null },
+        bannedAt: { type: Date, default: null },
         updatedBy: { type: Types.ObjectId, ref: "User" },
         changeCredentialTime: { type: Date },
 
         profilePic: { type: String },
         coverPic: { type: String },
-
-        OTP: [OTPSchema],
     },
     { timestamps: true }
 );
+
 
 // Virtual field for userName
 userSchema.virtual("userName").get(function () {
@@ -63,10 +54,9 @@ userSchema.pre("save", function (next) {
     next();
 });
 
-// Indexing for performance
-userSchema.index({ email: 1 }, { unique: true });
 
 const UserModel = mongoose.model("User", userSchema);
 
 export default UserModel;
+
 

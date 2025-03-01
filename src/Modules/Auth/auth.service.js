@@ -4,6 +4,7 @@ import { emailEmitter } from "../../utils/emails/emailEvents.js";
 import * as enumTypes from "../../DB/enumTypes.js";
 import { compareHash } from "../../utils/hashing/hash.js";
 import { generateToken } from "../../utils/token/token.js";
+import OTPModel from "../../DB/Models/OTP.model.js";
 
 export const signUp = async (req, res, next) => {
     const { firstName, lastName, email, password } = req.body;
@@ -25,19 +26,30 @@ export const signUp = async (req, res, next) => {
     });
 }
 
-
 export const confirmOTP = async (req, res, next) => {
     const { email, otp } = req.body;
 
+    // Find the user
     const user = await dbService.findOne({ model: UserModel, filter: { email } });
     if (!user) return next(new Error("User not found", { cause: 400 }));
-    if (user.confirmOTP == true) return next(new Error("Email already confirmed", { cause: 400 }))
+    if (user.isConfirmed) return next(new Error("Email already confirmed", { cause: 400 }));
 
-    const OTP = user.OTP.find((obj) => obj.type == enumTypes.OTPType.confirmEmail);
-    if (!OTP) return next(new Error("OTP not found", { cause: 400 }));
+    // Find the OTP in OTPModel
+    const OTP = await OTPModel.findOne({
+        userId: user._id,
+        type: enumTypes.OTPType.confirmEmail
+    });
 
-    if (!compareHash({ plainText: otp, hash: user.OTP[0].code }))
-        return next(new Error("Invalid OTP", { cause: 400 }))
+    // Check if OTP expired
+    const now = new Date();
+    const otpExpiryTime = new Date(OTP.createdAt.getTime() + (60000 * 10)); // 10 minutes
+    if (now > otpExpiryTime)
+        return next(new Error("OTP has expired", { cause: 400 }));
+
+    // Compare correct OTP
+    if (!compareHash({ plainText: otp, hash: OTP.code })) {
+        return next(new Error("Invalid OTP", { cause: 400 }));
+    }
 
     user.isConfirmed = true;
     await user.save();
@@ -46,7 +58,7 @@ export const confirmOTP = async (req, res, next) => {
         success: true,
         message: "Email confirmed successfully",
     });
-}
+};
 
 
 export const signIn = async (req, res, next) => {
@@ -85,3 +97,55 @@ export const signIn = async (req, res, next) => {
         },
     });
 }
+
+
+export const forgetPasswordOTP = async (req, res, next) => {
+    const { email } = req.body;
+
+    const user = await dbService.findOne({ model: UserModel, filter: { email } });
+    if (!user) return next(new Error("User not found", { cause: 400 }));
+
+    emailEmitter.emit("forgetPassword", email, user.userName, user._id);
+
+    return res.status(200).json({
+        success: true,
+        message: "email sent successfully",
+    });
+}
+
+
+export const resetPassword = async (req, res, next) => {
+    const { email, otp, password } = req.body;
+
+    // Find the user
+    const user = await dbService.findOne({ model: UserModel, filter: { email, deletedAt: null } });
+    if (!user) return next(new Error("User not found", { cause: 400 }));
+
+    // Find OTP for password reset
+    const OTP = await OTPModel.findOne({
+        userId: user._id,
+        type: enumTypes.OTPType.forgetPassword
+    });
+
+    // Check if OTP expired
+    const now = new Date();
+    const otpExpiryTime = new Date(OTP.createdAt.getTime() + (60000 * 10)); // 10 minutes
+    if (now > otpExpiryTime)
+        return next(new Error("OTP has expired", { cause: 400 }));
+
+    // Compare OTP
+    if (!compareHash({ plainText: otp, hash: OTP.code })) {
+        return next(new Error("Invalid OTP", { cause: 400 }));
+    }
+
+    // Set new password & call save() to trigger hashing middleware in the model
+    user.password = password;
+    await user.save();
+
+    return res.status(200).json({
+        success: true,
+        message: "Password reset successfully",
+    });
+};
+
+

@@ -25,5 +25,16 @@ router.post(
     asyncHandler(authService.signIn),
 );
 
+router.patch(
+    "/forgotPassword",
+    validation(authValidation.forgetPasswordSchema),
+    asyncHandler(authService.forgetPasswordOTP),
+);
+
+router.patch(
+    "/resetPassword",
+    validation(authValidation.resetPasswordSchema),
+    asyncHandler(authService.resetPassword),
+);
 
 export default router;
