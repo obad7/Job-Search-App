@@ -7,9 +7,21 @@ import * as authValidation from "./auth.validation.js";
 const router = Router();
 
 router.post(
-    "/register",
-    validation(authValidation.registerSchema),
-    asyncHandler(authService.register),
+    "/signUp",
+    validation(authValidation.signUpSchema),
+    asyncHandler(authService.signUp),
+);
+
+router.patch(
+    "/confirmOTP",
+    validation(authValidation.confirmOTPSchema),
+    asyncHandler(authService.confirmOTP),
+);
+
+router.post(
+    "/signIn",
+    validation(authValidation.signInSchema),
+    asyncHandler(authService.signIn),
 );
 
 

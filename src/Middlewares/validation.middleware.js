@@ -41,6 +41,7 @@ export const generalFaileds = {
 
     // TASK: format: YYYY-MM-DD
     DOB: joi.date().less("now"),
+    code: joi.string().pattern(new RegExp(/^[0-9]{6}$/)),
 
 
 }
