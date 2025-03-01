@@ -8,3 +8,7 @@ export const updateProfileSchema = joi.object({
     DOB: generalFaileds.DOB,
     mobileNumber: generalFaileds.mobileNumber,
 })
+
+export const viewOthersProfileSchema = joi.object({
+    userId: generalFaileds.id.required(),
+})

@@ -39,3 +39,28 @@ export const getProfile = async (req, res, next) => {
         data: { user },
     });
 };
+
+export const viewOthersProfile = async (req, res, next) => {
+    const { userId } = req.params;
+
+    const user = await UserModel.findById(userId)
+        .select("firstName lastName mobileNumber profilePic coverPic -_id")
+        .lean(); // Convert to plain JavaScript object
+
+    if (!user) return next(new Error("User not found", { cause: 400 }));
+
+    // Construct the userName
+    const userName = `${user.firstName} ${user.lastName}`;
+
+    // Remove firstName and lastName from the response
+    delete user.firstName;
+    delete user.lastName;
+
+    // Add userName to the response
+    user.userName = userName;
+
+    return res.status(200).json({
+        success: true,
+        data: user,
+    });
+};

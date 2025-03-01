@@ -57,7 +57,9 @@ userSchema.pre("save", function (next) {
 
 // Encrypt mobile number
 userSchema.post("findOne", function (doc) {
-    if (doc) {
+    if (!doc) return;
+
+    if (doc.mobileNumber) {
         doc.mobileNumber = decrypt({
             encrypted: doc.mobileNumber,
             signature: process.env.ENCRYPTION_KEY

@@ -22,4 +22,12 @@ router.get(
     asyncHandler(userService.getProfile),
 );
 
+router.get(
+    "/viewOthersProfile/:userId",
+    authentication(),
+    allowTo(["User"]),
+    validation(userValidation.viewOthersProfileSchema),
+    asyncHandler(userService.viewOthersProfile),
+);
+
 export default router;
