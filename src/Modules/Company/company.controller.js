@@ -76,5 +76,14 @@ router.delete(
     asyncHandler(companyService.deleteCoverPic),
 );
 
+router.patch(
+    "/legalAttachment/:companyId",
+    authentication(),
+    allowTo(["User"]),
+    validation(companyValidation.legalAttachmentSchema),
+    uploadOnCloud().single("legalAttachment"),
+    asyncHandler(companyService.uploadLegalAttachment),
+);
+
 
 export default router;

@@ -37,3 +37,7 @@ export const uploadCoverPicSchema = joi.object({
 export const deleteCoverPicSchema = joi.object({
     companyId: generalFaileds.id.required(),
 }).required();
+
+export const legalAttachmentSchema = joi.object({
+    companyId: generalFaileds.id.required(),
+}).required();

@@ -172,3 +172,28 @@ export const deleteCoverPic = async (req, res, next) => {
 
     return res.status(200).json({ success: true, message: "Cover picture deleted successfully" });
 };
+
+//legalAttachment (PDF or img) ⇒ {secure_url,public_id}
+
+
+export const uploadLegalAttachment = async (req, res, next) => {
+    const { companyId } = req.params;
+
+    // Check if company exists
+    const company = await dbService.findOne({ model: CompanyModel, filter: { _id: companyId } });
+    if (!company) return next(new Error("Company not found", { cause: 400 }));
+
+    // Check if company belongs to the user
+    if (company.createdBy.toString() !== req.user._id.toString() && !company.HRs.includes(req.user._id))
+        return next(new Error("You are not authorized to update this company", { cause: 400 }));
+
+    // Upload legal attachment
+    const { public_id, secure_url } = await cloudinary.uploader.upload(req.file.path,
+        { folder: `Companies/${company._id}/legalAttachment` }
+    );
+
+    company.legalAttachment = { public_id, secure_url };
+    await company.save();
+
+    return res.status(201).json({ success: true, message: "Legal attachment uploaded successfully" });
+};

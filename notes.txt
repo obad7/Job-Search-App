@@ -1,13 +1,11 @@
-User Apis
+User APIs
 4. signup with google **(1 Grade)**
 5. Login with google **(1 Grade)**
-DOF format
 
 
+Company APIs
 4. Get specific company with related jobs. (2 Grades)
     - Send the companyId
     - Return all jobs related to this company using virtual populate
-6. Upload company logo (1 Grade)
-7. Upload company Cover Pic (1 Grade) 
-8. Delete company logo (1 Grade)
-9. Delete company Cover Pic (1 Grade)
+    
+- if approvedByAdmin is false company cant add new jobs
