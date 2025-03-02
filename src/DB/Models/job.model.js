@@ -45,7 +45,11 @@ const jobSchema = new mongoose.Schema(
             ref: "Company",
         },
     },
-    { timestamps: true }
+    {
+        timestamps: true,
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true },
+    }
 );
 
 // virtual populate

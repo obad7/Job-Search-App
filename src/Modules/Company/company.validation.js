@@ -41,3 +41,7 @@ export const deleteCoverPicSchema = joi.object({
 export const legalAttachmentSchema = joi.object({
     companyId: generalFaileds.id.required(),
 }).required();
+
+export const getCompanyWithJobsSchema = joi.object({
+    companyId: generalFaileds.id.required(),
+})

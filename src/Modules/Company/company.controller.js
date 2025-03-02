@@ -85,5 +85,12 @@ router.patch(
     asyncHandler(companyService.uploadLegalAttachment),
 );
 
+router.get(
+    "/getCompany/:companyId",
+    authentication(),
+    allowTo(["User", "Admin"]),
+    validation(companyValidation.getCompanyWithJobsSchema),
+    asyncHandler(companyService.getCompanyWithJobs),
+)
 
 export default router;

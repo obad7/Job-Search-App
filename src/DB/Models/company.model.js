@@ -68,8 +68,16 @@ const companySchema = new Schema({
 },
     {
         timestamps: true,
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true },
     }
 );
+
+companySchema.virtual("jobs", {
+    ref: "Job",
+    localField: "_id",
+    foreignField: "companyId",
+});
 
 const CompanyModel = mongoose.model('Company', companySchema);
 
