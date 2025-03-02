@@ -4,8 +4,12 @@ import * as companyService from "./company.service.js";
 import { validation } from "../../Middlewares/validation.middleware.js";
 import * as companyValidation from "./company.validation.js";
 import { authentication, allowTo } from "../../Middlewares/auth.middleware.js";
+import jobRouter from "../Job/job.controller.js";
+
 
 const router = Router();
+
+router.use("/:companyId/job", jobRouter);
 
 router.post(
     "/createCompany",
