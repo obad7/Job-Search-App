@@ -1,6 +1,7 @@
 import * as dbService from "../../DB/dbService.js";
 import CompanyModel from "../../DB/Models/company.model.js";
 import cloudinary from "../../utils/file uploading/cloudinaryConfig.js";
+import { isUserAuthorizedForCompany } from "./helpers/checUsers.js";
 
 export const createCompany = async (req, res, next) => {
     const { companyName, companyEmail, numberOfEmployees, HR } = req.body;
@@ -93,7 +94,7 @@ export const uploadLogo = async (req, res, next) => {
     if (!company) return next(new Error("Company not found", { cause: 400 }));
 
     // Check if company belongs to the user
-    if (company.createdBy.toString() !== req.user._id.toString() && !company.HRs.includes(req.user._id))
+    if (!isUserAuthorizedForCompany(company, req.user._id))
         return next(new Error("You are not authorized to update this company", { cause: 400 }));
 
     // Upload logo
@@ -117,7 +118,7 @@ export const deleteLogo = async (req, res, next) => {
     if (!company) return next(new Error("Company not found", { cause: 400 }));
 
     // Check if company belongs to the user
-    if (company.createdBy.toString() !== req.user._id.toString() && !company.HRs.includes(req.user._id))
+    if (!isUserAuthorizedForCompany(company, req.user._id))
         return next(new Error("You are not authorized to update this company", { cause: 400 }));
 
     // Delete logo
@@ -138,7 +139,7 @@ export const uploadCoverPic = async (req, res, next) => {
     if (!company) return next(new Error("Company not found", { cause: 400 }));
 
     // Check if company belongs to the user
-    if (company.createdBy.toString() !== req.user._id.toString() && !company.HRs.includes(req.user._id))
+    if (!isUserAuthorizedForCompany(company, req.user._id))
         return next(new Error("You are not authorized to update this company", { cause: 400 }));
 
     // Upload cover picture
@@ -161,7 +162,7 @@ export const deleteCoverPic = async (req, res, next) => {
     if (!company) return next(new Error("Company not found", { cause: 400 }));
 
     // Check if company belongs to the user
-    if (company.createdBy.toString() !== req.user._id.toString() && !company.HRs.includes(req.user._id))
+    if (!isUserAuthorizedForCompany(company, req.user._id))
         return next(new Error("You are not authorized to update this company", { cause: 400 }));
 
     // Delete cover picture
@@ -182,7 +183,7 @@ export const uploadLegalAttachment = async (req, res, next) => {
     if (!company) return next(new Error("Company not found", { cause: 400 }));
 
     // Check if company belongs to the user
-    if (company.createdBy.toString() !== req.user._id.toString() && !company.HRs.includes(req.user._id))
+    if (!isUserAuthorizedForCompany(company, req.user._id))
         return next(new Error("You are not authorized to update this company", { cause: 400 }));
 
     // Upload legal attachment
@@ -204,8 +205,8 @@ export const getCompanyWithJobs = async (req, res, next) => {
     if (!company) return next(new Error("Company not found", { cause: 400 }));
 
     // Check if company belongs to the user
-    if (company.createdBy.toString() !== req.user._id.toString() && !company.HRs.includes(req.user._id))
-        return next(new Error("You are not authorized to update this company", { cause: 400 }));
+    if (!isUserAuthorizedForCompany(company, req.user._id))
+        return next(new Error("You are not authorized to view this company", { cause: 400 }));
 
     // Get company with related jobs
 
