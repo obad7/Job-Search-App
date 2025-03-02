@@ -30,4 +30,12 @@ router.get(
     asyncHandler(userService.viewOthersProfile),
 );
 
+router.patch(
+    "/updatePassword",
+    authentication(),
+    allowTo(["User"]),
+    validation(userValidation.updatePasswordSchema),
+    asyncHandler(userService.updatePassword),
+);
+
 export default router;

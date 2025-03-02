@@ -1,6 +1,7 @@
 import * as dbService from "../../DB/dbService.js";
 import UserModel from "../../DB/Models/user.model.js";
 import { encrypt } from "../../utils/encryption/encryption.js";
+import { compareHash } from "../../utils/hashing/hash.js";
 
 
 export const updateProfile = async (req, res, next) => {
@@ -64,3 +65,24 @@ export const viewOthersProfile = async (req, res, next) => {
         data: user,
     });
 };
+
+export const updatePassword = async (req, res, next) => {
+    const { oldPassword, password } = req.body;
+
+    if (!compareHash({ plainText: oldPassword, hash: req.user.password }))
+        return next(new Error("Invalid password", { cause: 400 }));
+
+    const user = await dbService.findOne({
+        model: UserModel,
+        filter: { _id: req.user._id },
+    });
+
+    // use user.save(); to trigger hashing hook
+    user.password = password;
+    await user.save();
+
+    return res.status(200).json({
+        success: true,
+        message: "Password updated successfully",
+    });
+}
