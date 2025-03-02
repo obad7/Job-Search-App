@@ -12,3 +12,14 @@ export const createJobSchema = joi.object({
     technicalSkills: joi.array().items(joi.string()),
     softSkills: joi.array().items(joi.string())
 }).required();
+
+export const updateJobSchema = joi.object({
+    jobId: generalFaileds.id.required(),
+    jobTitle: joi.string(),
+    jobLocation: joi.string().valid(...Object.values(enumTypes.jobLocationType)),
+    workingTime: joi.string().valid(...Object.values(enumTypes.workingTimeType)),
+    seniorityLevel: joi.string().valid(...Object.values(enumTypes.seniorityLevelType)),
+    jobDescription: joi.string(),
+    technicalSkills: joi.array().items(joi.string()),
+    softSkills: joi.array().items(joi.string()),
+}).required();

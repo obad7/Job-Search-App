@@ -23,3 +23,27 @@ export const createJob = async (req, res, next) => {
 
     return res.status(200).json({ success: true, data: newJob });
 };
+
+
+export const updateJob = async (req, res, next) => {
+    const { jobId } = req.params;
+    // Check if job exists
+    const job = await dbService.findOne({ model: JobModel, filter: { _id: jobId } });
+    if (!job) return next(new Error("Job not found", { cause: 400 }));
+
+    // Check if the user is authorized to update job
+    if (job.addedBy.toString() !== req.user._id.toString()) {
+        return next(new Error("You are not authorized to update this job", { cause: 400 }));
+    }
+
+    const updatedJob = await dbService.findByIdAndUpdate({
+        model: JobModel,
+        id: jobId,
+        data: { ...req.body, updatedBy: req.user._id },
+        options: { new: true, runValidators: true },
+    });
+
+    return res.status(200).json({ success: true, data: updatedJob });
+};
+
+

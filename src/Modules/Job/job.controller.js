@@ -7,6 +7,8 @@ import { authentication, allowTo } from "../../Middlewares/auth.middleware.js";
 
 const router = Router({ mergeParams: true });
 
+// mergeParams
+// company/:companyId/job/createJob
 router.post(
     "/createJob",
     authentication(),
@@ -15,5 +17,12 @@ router.post(
     asyncHandler(jobService.createJob),
 );
 
+router.patch(
+    "/updateJob/:jobId",
+    authentication(),
+    allowTo(["User"]),
+    validation(jobValidation.updateJobSchema),
+    asyncHandler(jobService.updateJob),
+);
 
 export default router;
