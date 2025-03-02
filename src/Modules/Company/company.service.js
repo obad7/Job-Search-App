@@ -1,5 +1,6 @@
 import * as dbService from "../../DB/dbService.js";
 import CompanyModel from "../../DB/Models/company.model.js";
+import UserModel from "../../DB/Models/user.model.js";
 
 
 export const createCompany = async (req, res, next) => {
@@ -49,4 +50,24 @@ export const updateCompany = async (req, res, next) => {
     });
 
     return res.status(201).json({ success: true, data: updatedCompany });
+};
+
+
+export const softDeleteCompany = async (req, res, next) => {
+    const { companyId } = req.params;
+
+    // Check if company exists
+    const company = await dbService.findOne({
+        model: CompanyModel,
+        filter: { _id: companyId, deletedAt: null }
+    });
+    if (!company) return next(new Error("Company not found"));
+
+    // Check if the user is authorized to delete
+    if (req.user.role === "Admin" || company.createdBy.toString() === req.user._id.toString()) {
+        company.deletedAt = new Date();
+        await company.save();
+        return res.status(200).json({ success: true, message: "Company deleted successfully" });
+    }
+    return next(new Error("You are not authorized to delete this company"));
 };

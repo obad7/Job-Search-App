@@ -23,5 +23,12 @@ router.patch(
     asyncHandler(companyService.updateCompany),
 );
 
+router.patch(
+    "/softDeleteCompany/:companyId",
+    authentication(),
+    allowTo(["User", "Admin"]),
+    validation(companyValidation.softDeleteCompanySchema),
+    asyncHandler(companyService.softDeleteCompany),
+);
 
 export default router;

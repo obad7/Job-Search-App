@@ -17,3 +17,7 @@ export const updateCompanySchema = joi.object({
     address: joi.string(),
     numberOfEmployees: joi.string().valid(...Object.values(enumTypes.numberOfEmployeesType)),
 }).required();
+
+export const softDeleteCompanySchema = joi.object({
+    companyId: generalFaileds.id.required(),
+}).required();
