@@ -23,3 +23,12 @@ export const tokenType = {
     access: "access",
     refresh: "refresh",
 };
+
+export const numberOfEmployeesType = [
+    "1-10",
+    "11-20",
+    "21-50",
+    "51-100",
+    "101-500",
+    "500+"
+];
