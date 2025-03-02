@@ -1,6 +1,7 @@
 import connectDB from "./DB/connection.js";
 import authRouter from "./Modules/Auth/auth.controller.js";
 import userRouter from "./Modules/User/user.controller.js";
+import companyRouter from "./Modules/Company/company.controller.js";
 import { notFoundHandler, globalErrorHandler } from "./utils/error handling/globalErrorHandler.js";
 import "./utils/jobs/deleteExpiredOTP.js";
 
@@ -11,6 +12,7 @@ const bootstrap = async (app, express) => {
 
     app.use("/auth", authRouter)
     app.use("/user", userRouter)
+    app.use("/company", companyRouter)
 
     // 404
     app.all("*", notFoundHandler);

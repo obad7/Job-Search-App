@@ -9,12 +9,10 @@ const companySchema = new Schema({
     },
     description: {
         type: String,
-        required: true,
         trim: true,
     },
     industry: {
         type: String,
-        required: true,
         trim: true,
     },
     address: {
@@ -36,7 +34,6 @@ const companySchema = new Schema({
     createdBy: {
         type: Schema.Types.ObjectId,
         ref: 'User',
-        required: true,
     },
     logo: {
         secure_url: { type: String },
@@ -74,6 +71,6 @@ const companySchema = new Schema({
     }
 );
 
-const Company = mongoose.model('Company', companySchema);
+const CompanyModel = mongoose.model('Company', companySchema);
 
-export default Company;
+export default CompanyModel;
