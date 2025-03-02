@@ -23,3 +23,8 @@ export const updateJobSchema = joi.object({
     technicalSkills: joi.array().items(joi.string()),
     softSkills: joi.array().items(joi.string()),
 }).required();
+
+export const deleteJobSchema = joi.object({
+    companyId: generalFaileds.id.required(),
+    jobId: generalFaileds.id.required(),
+}).required();

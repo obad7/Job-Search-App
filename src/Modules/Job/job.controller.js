@@ -25,4 +25,14 @@ router.patch(
     asyncHandler(jobService.updateJob),
 );
 
+// mergeParams
+// company/:companyId/job/deleteJob/:jobId
+router.delete(
+    "/deleteJob/:jobId",
+    authentication(),
+    allowTo(["User"]),
+    validation(jobValidation.deleteJobSchema),
+    asyncHandler(jobService.deleteJob),
+);
+
 export default router;
