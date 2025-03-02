@@ -35,8 +35,14 @@ const userSchema = new Schema(
         updatedBy: { type: Types.ObjectId, ref: "User" },
         changeCredentialTime: { type: Date },
 
-        profilePic: { type: String },
-        coverPic: { type: String },
+        profilePic: {
+            secure_url: { type: String },
+            public_id: { type: String },
+        },
+        coverPic: {
+            secure_url: { type: String },
+            public_id: { type: String },
+        },
     },
     { timestamps: true }
 );
