@@ -31,4 +31,9 @@ router.patch(
     asyncHandler(companyService.softDeleteCompany),
 );
 
+router.get(
+    "/searchCompany",
+    asyncHandler(companyService.searchCompany),
+);
+
 export default router;

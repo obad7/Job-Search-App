@@ -71,3 +71,15 @@ export const softDeleteCompany = async (req, res, next) => {
     }
     return next(new Error("You are not authorized to delete this company"));
 };
+
+
+export const searchCompany = async (req, res, next) => {
+    const { companyName } = req.query;
+
+    const companies = await dbService.find({
+        model: CompanyModel,
+        filter: { companyName: { $regex: companyName, $options: "i" } },
+    });
+
+    return res.status(200).json({ success: true, data: companies });
+};
