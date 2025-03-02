@@ -1,10 +1,9 @@
 import * as dbService from "../../DB/dbService.js";
 import CompanyModel from "../../DB/Models/company.model.js";
-import UserModel from "../../DB/Models/user.model.js";
 
 
 export const createCompany = async (req, res, next) => {
-    const { companyName, companyEmail, numberOfEmployees } = req.body;
+    const { companyName, companyEmail, numberOfEmployees, HR } = req.body;
 
     // Check if company name or email already exists
     const existingCompany = await dbService.findOne({
@@ -19,7 +18,8 @@ export const createCompany = async (req, res, next) => {
             createdBy: req.user._id,
             companyName,
             companyEmail,
-            numberOfEmployees
+            numberOfEmployees,
+            HRs: Array.isArray(HR) ? [...HR, req.user._id] : [req.user._id],
         },
     });
 
