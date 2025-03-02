@@ -1,6 +1,6 @@
 import * as dbService from "../../DB/dbService.js";
 import CompanyModel from "../../DB/Models/company.model.js";
-
+import cloudinary from "../../utils/file uploading/cloudinaryConfig.js";
 
 export const createCompany = async (req, res, next) => {
     const { companyName, companyEmail, numberOfEmployees, HR } = req.body;
@@ -82,4 +82,93 @@ export const searchCompany = async (req, res, next) => {
     });
 
     return res.status(200).json({ success: true, data: companies });
+};
+
+
+export const uploadLogo = async (req, res, next) => {
+    const { companyId } = req.params;
+
+    // Check if company exists
+    const company = await dbService.findOne({ model: CompanyModel, filter: { _id: companyId } });
+    if (!company) return next(new Error("Company not found", { cause: 400 }));
+
+    // Check if company belongs to the user
+    if (company.createdBy.toString() !== req.user._id.toString() && !company.HRs.includes(req.user._id))
+        return next(new Error("You are not authorized to update this company", { cause: 400 }));
+
+    // Upload logo
+    const { public_id, secure_url } = await cloudinary.uploader.upload(req.file.path,
+        { folder: `Companies/${company._id}/logo` }
+    );
+
+    company.logo = { public_id, secure_url };
+    await company.save();
+
+    return res.status(201).json({ success: true, message: "Logo uploaded successfully" });
+
+};
+
+
+export const deleteLogo = async (req, res, next) => {
+    const { companyId } = req.params;
+
+    // Check if company exists
+    const company = await dbService.findOne({ model: CompanyModel, filter: { _id: companyId } });
+    if (!company) return next(new Error("Company not found", { cause: 400 }));
+
+    // Check if company belongs to the user
+    if (company.createdBy.toString() !== req.user._id.toString() && !company.HRs.includes(req.user._id))
+        return next(new Error("You are not authorized to update this company", { cause: 400 }));
+
+    // Delete logo
+    if (company.logo.public_id) await cloudinary.uploader.destroy(company.logo.public_id);
+
+    company.logo = null;
+    await company.save();
+
+    return res.status(200).json({ success: true, message: "Logo deleted successfully" });
+};
+
+
+export const uploadCoverPic = async (req, res, next) => {
+    const { companyId } = req.params;
+
+    // Check if company exists
+    const company = await dbService.findOne({ model: CompanyModel, filter: { _id: companyId } });
+    if (!company) return next(new Error("Company not found", { cause: 400 }));
+
+    // Check if company belongs to the user
+    if (company.createdBy.toString() !== req.user._id.toString() && !company.HRs.includes(req.user._id))
+        return next(new Error("You are not authorized to update this company", { cause: 400 }));
+
+    // Upload cover picture
+    const { public_id, secure_url } = await cloudinary.uploader.upload(req.file.path,
+        { folder: `Companies/${company._id}/coverPic` }
+    );
+
+    company.coverPic = { public_id, secure_url };
+    await company.save();
+
+    return res.status(201).json({ success: true, message: "Cover picture uploaded successfully" });
+};
+
+
+export const deleteCoverPic = async (req, res, next) => {
+    const { companyId } = req.params;
+
+    // Check if company exists
+    const company = await dbService.findOne({ model: CompanyModel, filter: { _id: companyId } });
+    if (!company) return next(new Error("Company not found", { cause: 400 }));
+
+    // Check if company belongs to the user
+    if (company.createdBy.toString() !== req.user._id.toString() && !company.HRs.includes(req.user._id))
+        return next(new Error("You are not authorized to update this company", { cause: 400 }));
+
+    // Delete cover picture
+    if (company.coverPic.public_id) await cloudinary.uploader.destroy(company.coverPic.public_id);
+
+    company.coverPic = null;
+    await company.save();
+
+    return res.status(200).json({ success: true, message: "Cover picture deleted successfully" });
 };

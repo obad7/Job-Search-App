@@ -21,3 +21,19 @@ export const updateCompanySchema = joi.object({
 export const softDeleteCompanySchema = joi.object({
     companyId: generalFaileds.id.required(),
 }).required();
+
+export const uploadLogoSchema = joi.object({
+    companyId: generalFaileds.id.required(),
+}).required();
+
+export const deleteLogoSchema = joi.object({
+    companyId: generalFaileds.id.required(),
+}).required();
+
+export const uploadCoverPicSchema = joi.object({
+    companyId: generalFaileds.id.required(),
+}).required();
+
+export const deleteCoverPicSchema = joi.object({
+    companyId: generalFaileds.id.required(),
+}).required();

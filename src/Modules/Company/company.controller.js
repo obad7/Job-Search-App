@@ -5,6 +5,7 @@ import { validation } from "../../Middlewares/validation.middleware.js";
 import * as companyValidation from "./company.validation.js";
 import { authentication, allowTo } from "../../Middlewares/auth.middleware.js";
 import jobRouter from "../Job/job.controller.js";
+import { uploadOnCloud } from "../../utils/file uploading/multerCloud.js";
 
 
 const router = Router();
@@ -39,5 +40,41 @@ router.get(
     "/searchCompany",
     asyncHandler(companyService.searchCompany),
 );
+
+router.patch(
+    "/uploadLogo/:companyId",
+    authentication(),
+    allowTo(["User"]),
+    validation(companyValidation.uploadLogoSchema),
+    uploadOnCloud().single("logo"),
+    asyncHandler(companyService.uploadLogo),
+);
+
+router.delete(
+    "/deleteLogo/:companyId",
+    authentication(),
+    allowTo(["User"]),
+    validation(companyValidation.deleteLogoSchema),
+    uploadOnCloud().single("logo"),
+    asyncHandler(companyService.deleteLogo),
+);
+
+router.patch(
+    "/uploadCoverPic/:companyId",
+    authentication(),
+    allowTo(["User"]),
+    validation(companyValidation.uploadCoverPicSchema),
+    uploadOnCloud().single("coverPic"),
+    asyncHandler(companyService.uploadCoverPic),
+);
+
+router.delete(
+    "/deleteCoverPic/:companyId",
+    authentication(),
+    allowTo(["User"]),
+    validation(companyValidation.deleteCoverPicSchema),
+    asyncHandler(companyService.deleteCoverPic),
+);
+
 
 export default router;
