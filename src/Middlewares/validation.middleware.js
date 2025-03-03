@@ -32,7 +32,7 @@ export const validatePDFUpload = (req, res, next) => {
 };
 
 // validate image upload
-const validateImageUpload = (req, res, next) => {
+export const validateImageUpload = (req, res, next) => {
     const allowedImageTypes = ["image/jpeg", "image/jpg", "image/png"];
     if (!allowedImageTypes.includes(req.file.mimetype)) {
         return next(new Error("Only JPG, JPEG, and PNG images are allowed!", { cause: 400 }));

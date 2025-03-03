@@ -1,7 +1,7 @@
 import { Router } from "express";
 import asyncHandler from "../../utils/error handling/asyncHandler.js";
 import * as userService from "./user.service.js";
-import { validation } from "../../Middlewares/validation.middleware.js";
+import { validation, validateImageUpload } from "../../Middlewares/validation.middleware.js";
 import * as userValidation from "./user.validation.js";
 import { authentication, allowTo } from "../../Middlewares/auth.middleware.js";
 import { uploadOnCloud } from "../../utils/file uploading/multerCloud.js";
@@ -43,6 +43,7 @@ router.patch(
     "/uploadProfilePic",
     authentication(),
     uploadOnCloud().single("profilePic"),
+    validateImageUpload,
     asyncHandler(userService.uploadProfilePic),
 );
 
@@ -57,6 +58,7 @@ router.patch(
     "/uploadCoverPic",
     authentication(),
     uploadOnCloud().single("coverPic"),
+    validateImageUpload,
     asyncHandler(userService.uploadCoverPic),
 );
 

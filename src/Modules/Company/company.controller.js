@@ -1,7 +1,7 @@
 import { Router } from "express";
 import asyncHandler from "../../utils/error handling/asyncHandler.js";
 import * as companyService from "./company.service.js";
-import { validation } from "../../Middlewares/validation.middleware.js";
+import { validation, validateImageUpload, validatePDFUpload } from "../../Middlewares/validation.middleware.js";
 import * as companyValidation from "./company.validation.js";
 import { authentication, allowTo } from "../../Middlewares/auth.middleware.js";
 import jobRouter from "../Job/job.controller.js";
@@ -47,6 +47,7 @@ router.patch(
     allowTo(["User"]),
     validation(companyValidation.uploadLogoSchema),
     uploadOnCloud().single("logo"),
+    validateImageUpload,
     asyncHandler(companyService.uploadLogo),
 );
 
@@ -65,6 +66,7 @@ router.patch(
     allowTo(["User"]),
     validation(companyValidation.uploadCoverPicSchema),
     uploadOnCloud().single("coverPic"),
+    validateImageUpload,
     asyncHandler(companyService.uploadCoverPic),
 );
 
@@ -82,6 +84,7 @@ router.patch(
     allowTo(["User"]),
     validation(companyValidation.legalAttachmentSchema),
     uploadOnCloud().single("legalAttachment"),
+    validatePDFUpload,
     asyncHandler(companyService.uploadLegalAttachment),
 );
 
