@@ -72,17 +72,30 @@ export const deleteJob = async (req, res, next) => {
 // - user can search for company by it’s name
 
 
-// export const getAllJobs = async (req, res, next) => {
-//     const { companyId } = req.params;
-//     // Check if company exists
-//     const company = await dbService.findOne({ model: CompanyModel, filter: { _id: companyId } });
-//     if (!company) return next(new Error("Company not found", { cause: 400 }));
+export const getAllJobs = async (req, res, next) => {
+    let { companyId } = req.params; // Extract from URL params
+    let { companyName, page = 1, sort = -1 } = req.query; // Extract from query params
+    sort = parseInt(sort, 10) === 1 ? 1 : -1; // sort is only 1 or -1
 
-//     const jobs = await dbService.find({
-//         model: JobModel,
-//         filter: { companyId: companyId },
-//         options: { sort: { createdAt: -1 } },
-//     });
+    let filter = { deletedAt: null }; // Default filter for all jobs
+    // If `companyId` is provided, filter jobs by it
+    if (companyId) {
+        filter.companyId = companyId;
+    }
+    // If `companyName` is provided, find the company and filter by its ID
+    else if (companyName) {
+        const company = await dbService.findOne({ model: CompanyModel, filter: { companyName } });
+        if (!company) return next(new Error("Company not found", { cause: 400 }));
+        filter.companyId = company._id;
+    }
 
-//     return res.status(200).json({ success: true, data: jobs });
-// };
+    // If `companyId` or `companyName` is not provided, return all jobs (no company filter)
+    // Fetch jobs with pagination
+    const jobs = await JobModel.find(filter)
+        .sort({ createdAt: sort })
+        .paginate(page); // Using `paginate` method from `jobSchema`
+
+    return res.status(200).json({ success: true, data: jobs });
+
+};
+

@@ -35,4 +35,14 @@ router.delete(
     asyncHandler(jobService.deleteJob),
 );
 
+// mergeParams
+// use this if u want to search company ID: company/:companyId/job/getAllJob
+// use this if u want to search company name: /job/getAllJob
+router.get(
+    "/getAllJobs",
+    authentication(),
+    allowTo(["User", "Admin"]),
+    asyncHandler(jobService.getAllJobs),
+);
+
 export default router;
