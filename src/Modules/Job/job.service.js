@@ -66,11 +66,6 @@ export const deleteJob = async (req, res, next) => {
     return res.status(200).json({ success: true, message: "Job deleted successfully" });
 };
 
-// 4. Get all Jobs or a specific one for a specific company.
-// - using merge params and optional params
-// - use pagination(skip, limit, sort(ex.by createdAt) and total count)
-// - user can search for company by it’s name
-
 
 export const getAllJobs = async (req, res, next) => {
     let { companyId } = req.params; // Extract from URL params
