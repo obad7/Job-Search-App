@@ -20,7 +20,7 @@ const applicationSchema = new mongoose.Schema(
         status: {
             type: String,
             enum: Object.values(enumTypes.applicationStatusType),
-            default: "pending",
+            default: enumTypes.applicationStatusType.pending,
         },
     },
     { timestamps: true }

@@ -1,9 +1,10 @@
 import { Router } from "express";
 import asyncHandler from "../../utils/error handling/asyncHandler.js";
 import * as jobService from "./job.service.js";
-import { validation } from "../../Middlewares/validation.middleware.js";
+import { validation, validatePDFUpload } from "../../Middlewares/validation.middleware.js";
 import * as jobValidation from "./job.validation.js";
 import { authentication, allowTo } from "../../Middlewares/auth.middleware.js";
+import { uploadOnCloud } from "../../utils/file uploading/multerCloud.js";
 
 const router = Router({ mergeParams: true });
 
@@ -50,6 +51,16 @@ router.get(
     authentication(),
     allowTo(["User", "Admin"]),
     asyncHandler(jobService.filterJobs)
+);
+
+router.post(
+    "/applyToJob/:jobId",
+    authentication(),
+    allowTo(["User"]),
+    validation(jobValidation.applyToJobSchema),
+    uploadOnCloud().single("CV"),
+    validatePDFUpload, // middleware to validate PDF
+    asyncHandler(jobService.applyToJob),
 );
 
 export default router;

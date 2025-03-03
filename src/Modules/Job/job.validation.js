@@ -28,3 +28,8 @@ export const deleteJobSchema = joi.object({
     companyId: generalFaileds.id.required(),
     jobId: generalFaileds.id.required(),
 }).required();
+
+export const applyToJobSchema = joi.object({
+    jobId: generalFaileds.id.required(),
+    CV: joi.object(generalFaileds.fileObject.mimetype),
+})

@@ -1,6 +1,8 @@
 import * as dbService from "../../DB/dbService.js";
 import JobModel from "../../DB/Models/job.model.js";
 import CompanyModel from "../../DB/Models/company.model.js";
+import ApplicationModel from "../../DB/Models/application.model.js";
+import cloudinary from "../../utils/file uploading/cloudinaryConfig.js";
 
 
 export const createJob = async (req, res, next) => {
@@ -118,4 +120,40 @@ export const filterJobs = async (req, res, next) => {
 
     return res.status(200).json({ success: true, data: jobs });
 };
+
+
+// Apply to Job
+export const applyToJob = async (req, res, next) => {
+    const { jobId } = req.params;
+
+    // Check if job exists
+    const job = await dbService.findOne({ model: JobModel, filter: { _id: jobId } });
+    if (!job) return next(new Error("Job not found", { cause: 400 }));
+
+    // Check if user has already applied to this job
+    const application = await dbService.findOne({
+        model: ApplicationModel,
+        filter: { userId: req.user._id }
+    });
+    if (application) return next(new Error("You have already applied to this job", { cause: 400 }));
+
+    // Upload CV
+    const { public_id, secure_url } = await cloudinary.uploader.upload(req.file.path, {
+        folder: `Applications/userId-${req.user._id}/jobId-${jobId}/CV`
+    });
+
+    // Save application data
+    await dbService.create({
+        model: ApplicationModel,
+        data: {
+            jobId: jobId,
+            userId: req.user._id,
+            userCV: { secure_url, public_id },
+        },
+    });
+
+    return res.status(200).json({ success: true, message: "Applied to job successfully" });
+
+};
+
 
