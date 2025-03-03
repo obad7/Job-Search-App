@@ -133,7 +133,7 @@ export const applyToJob = async (req, res, next) => {
     // Check if user has already applied to this job
     const application = await dbService.findOne({
         model: ApplicationModel,
-        filter: { userId: req.user._id }
+        filter: { userId: req.user._id, jobId }
     });
     if (application) return next(new Error("You have already applied to this job", { cause: 400 }));
 
