@@ -99,3 +99,28 @@ export const getAllJobs = async (req, res, next) => {
 
 };
 
+
+export const filterJobs = async (req, res, next) => {
+    let { page = 1, sort = -1,
+        workingTime, jobLocation, seniorityLevel, jobTitle, technicalSkills } = req.query;
+
+    page = parseInt(page, 10) || 1;
+    sort = parseInt(sort, 10) === 1 ? 1 : -1;
+
+    let filter = { deletedAt: null }; // Only fetch non-deleted jobs
+
+    // Apply filters if provided
+    if (workingTime) filter.workingTime = workingTime;
+    if (jobLocation) filter.jobLocation = jobLocation;
+    if (seniorityLevel) filter.seniorityLevel = seniorityLevel;
+    if (jobTitle) filter.jobTitle = new RegExp(jobTitle, "i"); // Case-insensitive search
+    if (technicalSkills) filter.technicalSkills = { $in: technicalSkills.split(",") }; // Match any skill
+
+    // Fetch filtered jobs with pagination
+    const jobs = await JobModel.find(filter)
+        .sort({ createdAt: sort })
+        .paginate(page);
+
+    return res.status(200).json({ success: true, data: jobs });
+};
+

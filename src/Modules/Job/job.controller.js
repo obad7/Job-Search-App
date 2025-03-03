@@ -45,4 +45,11 @@ router.get(
     asyncHandler(jobService.getAllJobs),
 );
 
+router.get(
+    "/filterJobs",
+    authentication(),
+    allowTo(["User", "Admin"]),
+    asyncHandler(jobService.filterJobs)
+);
+
 export default router;
