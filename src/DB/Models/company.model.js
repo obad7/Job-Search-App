@@ -1,5 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import * as enumTypes from "../enumTypes.js";
+import paginationPlugin from "../../utils/Plugins/paginationPlugin.js";
+
 const companySchema = new Schema({
     companyName: {
         type: String,
@@ -78,6 +80,9 @@ companySchema.virtual("jobs", {
     localField: "_id",
     foreignField: "companyId",
 });
+
+// Pagination plugin for mongoose
+applicationSchema.plugin(paginationPlugin);
 
 const CompanyModel = mongoose.model('Company', companySchema);
 

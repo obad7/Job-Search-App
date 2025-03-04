@@ -2,6 +2,7 @@ import mongoose, { Schema, model, Types } from "mongoose";
 import { hash } from "../../utils/hashing/hash.js";
 import * as enumTypes from "../enumTypes.js";
 import { decrypt } from "../../utils/encryption/encryption.js";
+import paginationPlugin from "../../utils/Plugins/paginationPlugin.js";
 
 
 const userSchema = new Schema(
@@ -73,6 +74,8 @@ userSchema.post("findOne", function (doc) {
     }
 });
 
+// Pagination plugin for mongoose
+applicationSchema.plugin(paginationPlugin);
 
 const UserModel = mongoose.model("User", userSchema);
 

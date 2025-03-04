@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import * as enumTypes from "../enumTypes.js";
+import paginationPlugin from "../../utils/Plugins/paginationPlugin.js";
 
 const jobSchema = new mongoose.Schema(
     {
@@ -85,6 +86,9 @@ jobSchema.query.paginate = async function (page) {
     }
 
 };
+
+// pagination plugin for mongoose
+jobSchema.plugin(paginationPlugin);
 
 const JobModel = mongoose.model("Job", jobSchema);
 
