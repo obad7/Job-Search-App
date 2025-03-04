@@ -71,4 +71,12 @@ router.get(
     asyncHandler(jobService.getApplicationsRelatedToJob),
 );
 
+router.patch(
+    "/:jobId/updateApplicationStatus/:applicationId",
+    authentication(),
+    allowTo(["User"]),
+    validation(jobValidation.updateApplicationSchema),
+    asyncHandler(jobService.updateApplicationStatus),
+);
+
 export default router;

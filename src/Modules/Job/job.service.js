@@ -3,6 +3,7 @@ import JobModel from "../../DB/Models/job.model.js";
 import CompanyModel from "../../DB/Models/company.model.js";
 import ApplicationModel from "../../DB/Models/application.model.js";
 import cloudinary from "../../utils/file uploading/cloudinaryConfig.js";
+import { isUserAuthorizedForCompany } from "../../Modules/Company/helpers/checUsers.js";
 
 
 export const createJob = async (req, res, next) => {
@@ -169,8 +170,8 @@ export const getApplicationsRelatedToJob = async (req, res, next) => {
 
     // check if the user is authorized to view applications related to the job
     const company = await dbService.findOne({ model: CompanyModel, filter: { _id: job.companyId } });
-    if (company.createdBy.toString() !== req.user._id.toString() && !company.HRs.includes(req.user._id))
-        return next(new Error("You are not authorized", { cause: 400 }));
+    if (!isUserAuthorizedForCompany(company, req.user._id))
+        return next(new Error("unauthorized", { cause: 400 }));
 
     // Fetch applications related to the job usuing populate
     const applications = await ApplicationModel
@@ -183,6 +184,32 @@ export const getApplicationsRelatedToJob = async (req, res, next) => {
 }
 
 
-export const acceptOrRejectApplication = async (req, res, next) => {
+export const updateApplicationStatus = async (req, res, next) => {
+    const { applicationId } = req.params;
+    const { status } = req.body;
 
-}
+    // Fetch application and populate job and company data
+    const application = await ApplicationModel.findOne({ _id: applicationId })
+        .populate({
+            path: "jobId",
+            populate: { path: "companyId", select: "createdBy HRs" },
+            select: "companyId",
+        });
+
+    if (!application) return next(new Error("Application not found", { cause: 400 }));
+    if (!application.jobId) return next(new Error("Job not found", { cause: 400 }));
+    if (!application.jobId.companyId) return next(new Error("Company not found", { cause: 400 }));
+
+    const company = application.jobId.companyId;
+
+    // Check authorization (only company creator or HRs can update)
+    if (!isUserAuthorizedForCompany(company, req.user._id))
+        return next(new Error("You are not authorized to update this application", { cause: 400 }));
+
+    // Update application status
+    application.status = status;
+    await application.save();
+
+    return res.status(200).json({ success: true, message: "Application updated successfully" });
+
+};

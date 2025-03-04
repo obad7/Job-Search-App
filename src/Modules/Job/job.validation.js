@@ -38,3 +38,9 @@ export const getApplicationsSchema = joi.object({
     page: joi.number().integer().min(1).optional(),
     sort: joi.number().integer().min(-1).max(1).optional(),
 })
+
+export const updateApplicationSchema = joi.object({
+    applicationId: generalFaileds.id.required(),
+    jobId: generalFaileds.id.required(),
+    status: joi.string().valid(...Object.values(enumTypes.applicationStatusType)).required(),
+})

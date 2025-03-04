@@ -75,7 +75,7 @@ userSchema.post("findOne", function (doc) {
 });
 
 // Pagination plugin for mongoose
-applicationSchema.plugin(paginationPlugin);
+userSchema.plugin(paginationPlugin);
 
 const UserModel = mongoose.model("User", userSchema);
 

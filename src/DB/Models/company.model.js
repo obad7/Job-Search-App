@@ -82,7 +82,7 @@ companySchema.virtual("jobs", {
 });
 
 // Pagination plugin for mongoose
-applicationSchema.plugin(paginationPlugin);
+companySchema.plugin(paginationPlugin);
 
 const CompanyModel = mongoose.model('Company', companySchema);
 
