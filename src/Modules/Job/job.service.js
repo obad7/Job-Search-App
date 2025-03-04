@@ -181,3 +181,8 @@ export const getApplicationsRelatedToJob = async (req, res, next) => {
 
     return res.status(200).json({ success: true, data: applications });
 }
+
+
+export const acceptOrRejectApplication = async (req, res, next) => {
+
+}
