@@ -157,3 +157,27 @@ export const applyToJob = async (req, res, next) => {
 };
 
 
+export const getApplicationsRelatedToJob = async (req, res, next) => {
+    const { jobId } = req.params;
+    const { page } = req.query;
+    let { sort } = req.query;
+    sort = parseInt(sort, 10) === 1 ? 1 : -1;
+
+    // Check if job exists
+    const job = await dbService.findOne({ model: JobModel, filter: { _id: jobId } });
+    if (!job) return next(new Error("Job not found", { cause: 400 }));
+
+    // check if the user is authorized to view applications related to the job
+    const company = await dbService.findOne({ model: CompanyModel, filter: { _id: job.companyId } });
+    if (company.createdBy.toString() !== req.user._id.toString() && !company.HRs.includes(req.user._id))
+        return next(new Error("You are not authorized", { cause: 400 }));
+
+    // Fetch applications related to the job usuing populate
+    const applications = await ApplicationModel
+        .find({ jobId: jobId })
+        .populate("userId")
+        .sort({ createdAt: sort })
+        .paginate(page);
+
+    return res.status(200).json({ success: true, data: applications });
+}

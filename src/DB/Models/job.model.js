@@ -60,6 +60,12 @@ jobSchema.virtual("company", {
     justOne: true,
 });
 
+jobSchema.virtual("application", {
+    ref: "Application",
+    localField: "_id",
+    foreignField: "jobId",
+});
+
 // pagination method
 jobSchema.query.paginate = async function (page) {
     page = page ? page : 1;

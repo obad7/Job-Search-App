@@ -63,4 +63,12 @@ router.post(
     asyncHandler(jobService.applyToJob),
 );
 
+router.get(
+    "/getApplications/:jobId",
+    authentication(),
+    allowTo(["User"]),
+    validation(jobValidation.getApplicationsSchema),
+    asyncHandler(jobService.getApplicationsRelatedToJob),
+);
+
 export default router;

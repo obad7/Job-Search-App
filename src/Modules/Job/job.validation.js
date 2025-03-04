@@ -32,3 +32,9 @@ export const deleteJobSchema = joi.object({
 export const applyToJobSchema = joi.object({
     jobId: generalFaileds.id.required(),
 })
+
+export const getApplicationsSchema = joi.object({
+    jobId: generalFaileds.id.required(),
+    page: joi.number().integer().min(1).optional(),
+    sort: joi.number().integer().min(-1).max(1).optional(),
+})

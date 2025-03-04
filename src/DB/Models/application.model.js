@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import * as enumTypes from "../enumTypes.js";
+import paginationPlugin from "../../utils/Plugins/paginationPlugin.js";
 
 const applicationSchema = new mongoose.Schema(
     {
@@ -22,9 +23,13 @@ const applicationSchema = new mongoose.Schema(
             enum: Object.values(enumTypes.applicationStatusType),
             default: enumTypes.applicationStatusType.pending,
         },
+        deletedAt: { type: Date, default: null },
     },
     { timestamps: true }
 );
+
+// apply pagination to the model
+applicationSchema.plugin(paginationPlugin);
 
 const ApplicationModel = mongoose.model("Application", applicationSchema);
 export default ApplicationModel;
