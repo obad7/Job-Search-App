@@ -4,6 +4,7 @@ import CompanyModel from "../../DB/Models/company.model.js";
 import ApplicationModel from "../../DB/Models/application.model.js";
 import cloudinary from "../../utils/file uploading/cloudinaryConfig.js";
 import { isUserAuthorizedForCompany } from "../../Modules/Company/helpers/checUsers.js";
+import { emailEmitter } from "../../utils/emails/emailEvents.js";
 
 
 export const createJob = async (req, res, next) => {
@@ -188,28 +189,55 @@ export const updateApplicationStatus = async (req, res, next) => {
     const { applicationId } = req.params;
     const { status } = req.body;
 
-    // Fetch application and populate job and company data
+    // Fetch application and populate job, company, and user data
     const application = await ApplicationModel.findOne({ _id: applicationId })
         .populate({
             path: "jobId",
-            populate: { path: "companyId", select: "createdBy HRs" },
-            select: "companyId",
-        });
+            populate: { path: "companyId", select: "createdBy HRs companyName" },
+            select: "companyId jobTitle",
+        })
+        .populate("userId", "firstName email"); // Populate user details
 
     if (!application) return next(new Error("Application not found", { cause: 400 }));
     if (!application.jobId) return next(new Error("Job not found", { cause: 400 }));
     if (!application.jobId.companyId) return next(new Error("Company not found", { cause: 400 }));
 
-    const company = application.jobId.companyId;
+    const company = application.jobId.companyId; // Get company data
 
     // Check authorization (only company creator or HRs can update)
-    if (!isUserAuthorizedForCompany(company, req.user._id))
+    if (!isUserAuthorizedForCompany(company, req.user._id)) {
         return next(new Error("You are not authorized to update this application", { cause: 400 }));
+    }
 
     // Update application status
     application.status = status;
     await application.save();
 
+    console.log(application.userId.firstName);
+    console.log(application.userId.email);
+    console.log(application.jobId.jobTitle);
+
+    // Send email
+    if (status === "accepted") {
+        emailEmitter.emit(
+            "sendAcceptanceEmail",
+            application.userId.firstName,
+            application.userId.email,
+            application.jobId.jobTitle,
+            application.jobId.companyId.companyName
+        );
+    } else if (status === "rejected") {
+        emailEmitter.emit(
+            "sendRejectionEmail",
+            application.userId.firstName,
+            application.userId.email,
+            application.jobId.jobTitle,
+            application.jobId.companyId.companyName
+        );
+    }
+
     return res.status(200).json({ success: true, message: "Application updated successfully" });
 
 };
+
+

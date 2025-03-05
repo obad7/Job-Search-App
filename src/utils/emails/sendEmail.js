@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 
-const sendEmail = async ({to, subject, html}) => {
+const sendEmail = async ({ to, subject, html }) => {
     const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
         port: process.env.SMTP_PORT,
@@ -11,8 +11,8 @@ const sendEmail = async ({to, subject, html}) => {
         },
     });
 
-    const message = await transporter.sendMail({    
-        from: `"Social Media App" <${process.env.SMTP_EMAIL}>`,
+    const message = await transporter.sendMail({
+        from: `"Job Search App" <${process.env.SMTP_EMAIL}>`,
         to,
         subject,
         html,
@@ -24,6 +24,8 @@ export const subject = {
     resetPassword: "Reset Password",
     verifyEmail: "Activate your account",
     updateEmail: "Update your email",
+    acceptanceEmail: "Acceptance Email",
+    rejectionEmail: "Rejection Email",
 }
 
 export default sendEmail;

@@ -1,13 +1,14 @@
-import * as dbService from "../../DB/dbService.js";
 import { EventEmitter } from "events";
 import sendEmail, { subject } from "./sendEmail.js";
-import { signUpHTML } from "./generateHTML.js";
+import { signUpHTML, acceptanceEmailHTML, rejectionEmailHTML } from "./generateHTML.js";
 import { customAlphabet } from "nanoid";
 import OTPModel from "../../DB/Models/OTP.model.js";
-import { hash } from './../hashing/hash.js';
+import { hash } from "./../hashing/hash.js";
 import * as enumTypes from "../../DB/enumTypes.js";
 
 export const emailEmitter = new EventEmitter();
+
+// Event for sending an acceptance email (new addition)
 
 emailEmitter.on("sendEmail", async (userName, email, id) => {
     await sendCode({
@@ -30,8 +31,24 @@ emailEmitter.on("updateEmail", async (email, userName, id) => {
     });
 });
 
+emailEmitter.on("sendAcceptanceEmail", async (userName, email, jobTitle, companyName) => {
+    await sendEmail({
+        to: email,
+        subject: subject.acceptanceEmail,
+        html: acceptanceEmailHTML(userName, jobTitle, companyName, subject.acceptanceEmail),
+    });
+});
 
-//Generates a new OTP, hashes it, stores it in the `OTPModel`, and sends an email.
+emailEmitter.on("sendRejectionEmail", async (userName, email, jobTitle, companyName) => {
+    await sendEmail({
+        to: email,
+        subject: subject.rejectionEmail,
+        html: rejectionEmailHTML(userName, jobTitle, companyName, subject.rejectionEmail),
+    });
+});
+
+
+// Generates and sends an OTP email
 export const sendCode = async ({ data = {}, subjectType = subject.verifyEmail }) => {
     try {
         const { userName, email, id } = data;
@@ -41,15 +58,20 @@ export const sendCode = async ({ data = {}, subjectType = subject.verifyEmail })
         const hashedOtp = hash({ plainText: otp });
 
         let otpType;
+        let html;
+
         switch (subjectType) {
             case subject.verifyEmail:
                 otpType = enumTypes.OTPType.confirmEmail;
+                html = signUpHTML(otp, userName, subjectType);
                 break;
             case subject.resetPassword:
                 otpType = enumTypes.OTPType.forgetPassword;
+                html = signUpHTML(otp, userName, subjectType);
                 break;
             case subject.updateEmail:
                 otpType = enumTypes.OTPType.updateEmail;
+                html = signUpHTML(otp, userName, subjectType);
                 break;
             default:
                 throw new Error("Invalid OTP Type");
@@ -70,10 +92,11 @@ export const sendCode = async ({ data = {}, subjectType = subject.verifyEmail })
         await sendEmail({
             to: email,
             subject: subjectType,
-            html: signUpHTML(otp, userName, subjectType),
+            html,
         });
 
     } catch (error) {
         console.log("Error sending OTP:", error);
     }
 };
+
