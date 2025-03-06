@@ -7,23 +7,33 @@ import adminRouter from "./Modules/Admin/admin.controller.js";
 import { notFoundHandler, globalErrorHandler } from "./utils/error handling/globalErrorHandler.js";
 import "./utils/jobs/deleteExpiredOTP.js";
 
+// GraphQL
+import { createHandler } from "graphql-http/lib/use/express";
+import { schema } from "./Modules/app.graph.js";
+
 const bootstrap = async (app, express) => {
     await connectDB();
 
     app.use(express.json());
 
-    app.use("/admin", adminRouter)
-    app.use("/auth", authRouter)
-    app.use("/user", userRouter)
-    app.use("/company", companyRouter)
-    app.use("/job", jobRouter)
+    app.use(
+        "/graphql",
+        createHandler({
+            schema: schema,
+        })
+    );
+
+    app.use("/admin", adminRouter);
+    app.use("/auth", authRouter);
+    app.use("/user", userRouter);
+    app.use("/company", companyRouter);
+    app.use("/job", jobRouter);
 
     // 404
     app.all("*", notFoundHandler);
 
-    // global error handler
+    // Global error handler
     app.use(globalErrorHandler);
-
-}
+};
 
 export default bootstrap;

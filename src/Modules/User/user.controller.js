@@ -11,7 +11,7 @@ const router = Router();
 router.patch(
     "/updateProfile",
     authentication(),
-    allowTo(["User"]),
+    allowTo(["User", "Admin"]),
     validation(userValidation.updateProfileSchema),
     asyncHandler(userService.updateProfile),
 );
@@ -19,7 +19,7 @@ router.patch(
 router.get(
     "/getProfile",
     authentication(),
-    allowTo(["User"]),
+    allowTo(["User", "Admin"]),
     asyncHandler(userService.getProfile),
 );
 

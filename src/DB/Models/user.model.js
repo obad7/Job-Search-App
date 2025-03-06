@@ -69,8 +69,9 @@ userSchema.post("findOne", function (doc) {
     if (doc.mobileNumber) {
         doc.mobileNumber = decrypt({
             encrypted: doc.mobileNumber,
-            signature: process.env.ENCRYPTION_KEY
+            signature: process.env.ENCRYPTION_KEY,
         });
+        console.log(doc.mobileNumber);
     }
 });
 
