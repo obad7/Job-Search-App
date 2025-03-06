@@ -9,7 +9,7 @@ export const createCompany = async (req, res, next) => {
     // Check if company name or email already exists
     const existingCompany = await dbService.findOne({
         model: CompanyModel,
-        filter: { $or: [{ companyEmail }, { companyName }] },
+        filter: { $or: [{ companyEmail }, { companyName }], deletedAt: null },
     });
     if (existingCompany) return next(new Error("Company already exists", { cause: 400 }));
 
@@ -39,7 +39,7 @@ export const updateCompany = async (req, res, next) => {
     if (company.createdBy.toString() !== req.user._id.toString())
         return next(new Error("You are not authorized to update this company", { cause: 400 }));
 
-    // Check if legalAttachment is not allowed to update
+    // legalAttachment is not allowed to update
     if (req.body.legalAttachment)
         return next(new Error("legalAttachment is not allowed to update", { cause: 400 }));
 
@@ -79,7 +79,7 @@ export const searchCompany = async (req, res, next) => {
 
     const companies = await dbService.find({
         model: CompanyModel,
-        filter: { companyName: { $regex: companyName, $options: "i" } },
+        filter: { companyName: { $regex: companyName, $options: "i" }, deletedAt: null },
     });
 
     return res.status(200).json({ success: true, data: companies });
@@ -90,7 +90,7 @@ export const uploadLogo = async (req, res, next) => {
     const { companyId } = req.params;
 
     // Check if company exists
-    const company = await dbService.findOne({ model: CompanyModel, filter: { _id: companyId } });
+    const company = await dbService.findOne({ model: CompanyModel, filter: { _id: companyId, deletedAt: null } });
     if (!company) return next(new Error("Company not found", { cause: 400 }));
 
     // Check if company belongs to the user
@@ -114,7 +114,7 @@ export const deleteLogo = async (req, res, next) => {
     const { companyId } = req.params;
 
     // Check if company exists
-    const company = await dbService.findOne({ model: CompanyModel, filter: { _id: companyId } });
+    const company = await dbService.findOne({ model: CompanyModel, filter: { _id: companyId, deletedAt: null } });
     if (!company) return next(new Error("Company not found", { cause: 400 }));
 
     // Check if company belongs to the user
@@ -135,7 +135,7 @@ export const uploadCoverPic = async (req, res, next) => {
     const { companyId } = req.params;
 
     // Check if company exists
-    const company = await dbService.findOne({ model: CompanyModel, filter: { _id: companyId } });
+    const company = await dbService.findOne({ model: CompanyModel, filter: { _id: companyId, deletedAt: null } });
     if (!company) return next(new Error("Company not found", { cause: 400 }));
 
     // Check if company belongs to the user
@@ -158,7 +158,7 @@ export const deleteCoverPic = async (req, res, next) => {
     const { companyId } = req.params;
 
     // Check if company exists
-    const company = await dbService.findOne({ model: CompanyModel, filter: { _id: companyId } });
+    const company = await dbService.findOne({ model: CompanyModel, filter: { _id: companyId, deletedAt: null } });
     if (!company) return next(new Error("Company not found", { cause: 400 }));
 
     // Check if company belongs to the user
@@ -179,7 +179,7 @@ export const uploadLegalAttachment = async (req, res, next) => {
     const { companyId } = req.params;
 
     // Check if company exists
-    const company = await dbService.findOne({ model: CompanyModel, filter: { _id: companyId } });
+    const company = await dbService.findOne({ model: CompanyModel, filter: { _id: companyId, deletedAt: null } });
     if (!company) return next(new Error("Company not found", { cause: 400 }));
 
     // Check if company belongs to the user
@@ -201,22 +201,20 @@ export const uploadLegalAttachment = async (req, res, next) => {
 export const getCompanyWithJobs = async (req, res, next) => {
     const { companyId } = req.params;
     // Check if company exists
-    const company = await dbService.findOne({ model: CompanyModel, filter: { _id: companyId } });
+    const company = await dbService.findOne({ model: CompanyModel, filter: { _id: companyId, deletedAt: null } });
     if (!company) return next(new Error("Company not found", { cause: 400 }));
 
     // Check if company belongs to the user
     if (!isUserAuthorizedForCompany(company, req.user._id))
         return next(new Error("You are not authorized to view this company", { cause: 400 }));
 
-    // Get company with related jobs
 
     const companyWithJobs = await dbService.findOne({
         model: CompanyModel, filter:
             { _id: companyId },
         populate: {
-            path: "jobs", populate: {
-                path: "companyId", select: "companyName industry"
-            }
+            path: "jobs",
+            populate: { path: "companyId", select: "companyName industry" }
         }
     });
 

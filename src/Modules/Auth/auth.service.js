@@ -31,7 +31,7 @@ export const confirmOTP = async (req, res, next) => {
     const { email, otp } = req.body;
 
     // Find the user
-    const user = await dbService.findOne({ model: UserModel, filter: { email } });
+    const user = await dbService.findOne({ model: UserModel, filter: { email, deletedAt: null } });
     if (!user) return next(new Error("User not found", { cause: 400 }));
     if (user.isConfirmed) return next(new Error("Email already confirmed", { cause: 400 }));
 
@@ -65,7 +65,7 @@ export const confirmOTP = async (req, res, next) => {
 export const signIn = async (req, res, next) => {
     const { email, password } = req.body;
 
-    const user = await dbService.findOne({ model: UserModel, filter: { email } });
+    const user = await dbService.findOne({ model: UserModel, filter: { email, deletedAt: null } });
     if (!user) return next(new Error("User not found", { cause: 400 }));
     if (!user.isConfirmed) return next(new Error("Email not confirmed. Please confirm your email", { cause: 400 }));
 
@@ -103,7 +103,7 @@ export const signIn = async (req, res, next) => {
 export const forgetPasswordOTP = async (req, res, next) => {
     const { email } = req.body;
 
-    const user = await dbService.findOne({ model: UserModel, filter: { email } });
+    const user = await dbService.findOne({ model: UserModel, filter: { email, deletedAt: null } });
     if (!user) return next(new Error("User not found", { cause: 400 }));
 
     emailEmitter.emit("forgetPassword", email, user.userName, user._id);

@@ -81,9 +81,9 @@ export const deleteJob = async (req, res, next) => {
 
 
 export const getAllJobs = async (req, res, next) => {
-    let { companyId } = req.params; // Extract from URL params
-    let { companyName, page = 1, sort = -1 } = req.query; // Extract from query params
-    sort = parseInt(sort, 10) === 1 ? 1 : -1; // sort is only 1 or -1
+    let { companyId } = req.params;
+    let { companyName, page = 1, sort = -1 } = req.query;
+    sort = parseInt(sort, 10) === 1 ? 1 : -1;
 
     let filter = { deletedAt: null }; // Default filter for all jobs
     // If `companyId` is provided, filter jobs by it
@@ -92,7 +92,7 @@ export const getAllJobs = async (req, res, next) => {
     }
     // If `companyName` is provided, find the company and filter by its ID
     else if (companyName) {
-        const company = await dbService.findOne({ model: CompanyModel, filter: { companyName } });
+        const company = await dbService.findOne({ model: CompanyModel, filter: { companyName, deletedAt: null } });
         if (!company) return next(new Error("Company not found", { cause: 400 }));
         filter.companyId = company._id;
     }
@@ -115,14 +115,14 @@ export const filterJobs = async (req, res, next) => {
     page = parseInt(page, 10) || 1;
     sort = parseInt(sort, 10) === 1 ? 1 : -1;
 
-    let filter = { deletedAt: null }; // Only fetch non-deleted jobs
+    let filter = { deletedAt: null };
 
     // Apply filters if provided
     if (workingTime) filter.workingTime = workingTime;
     if (jobLocation) filter.jobLocation = jobLocation;
     if (seniorityLevel) filter.seniorityLevel = seniorityLevel;
-    if (jobTitle) filter.jobTitle = new RegExp(jobTitle, "i"); // Case-insensitive search
-    if (technicalSkills) filter.technicalSkills = { $in: technicalSkills.split(",") }; // Match any skill
+    if (jobTitle) filter.jobTitle = new RegExp(jobTitle, "i");
+    if (technicalSkills) filter.technicalSkills = { $in: technicalSkills.split(",") };
 
     // Fetch filtered jobs with pagination
     const jobs = await JobModel.find(filter)
@@ -133,18 +133,17 @@ export const filterJobs = async (req, res, next) => {
 };
 
 
-// Apply to Job
 export const applyToJob = async (req, res, next) => {
     const { jobId } = req.params;
 
     // Check if job exists
-    const job = await dbService.findOne({ model: JobModel, filter: { _id: jobId } });
+    const job = await dbService.findOne({ model: JobModel, filter: { _id: jobId, deletedAt: null } });
     if (!job) return next(new Error("Job not found", { cause: 400 }));
 
     // Check if user has already applied to this job
     const application = await dbService.findOne({
         model: ApplicationModel,
-        filter: { userId: req.user._id, jobId }
+        filter: { userId: req.user._id, jobId, deletedAt: null },
     });
     if (application) return next(new Error("You have already applied to this job", { cause: 400 }));
 
@@ -164,7 +163,6 @@ export const applyToJob = async (req, res, next) => {
     });
 
     return res.status(200).json({ success: true, message: "Applied to job successfully" });
-
 };
 
 
@@ -175,11 +173,12 @@ export const getApplicationsRelatedToJob = async (req, res, next) => {
     sort = parseInt(sort, 10) === 1 ? 1 : -1;
 
     // Check if job exists
-    const job = await dbService.findOne({ model: JobModel, filter: { _id: jobId } });
+    const job = await dbService.findOne({ model: JobModel, filter: { _id: jobId, deletedAt: null } });
     if (!job) return next(new Error("Job not found", { cause: 400 }));
 
     // check if the user is authorized to view applications related to the job
-    const company = await dbService.findOne({ model: CompanyModel, filter: { _id: job.companyId } });
+    const company = await dbService.findOne({ model: CompanyModel, filter: { _id: job.companyId, deletedAt: null } });
+
     if (!isUserAuthorizedForCompany(company, req.user._id))
         return next(new Error("unauthorized", { cause: 400 }));
 
@@ -199,10 +198,10 @@ export const updateApplicationStatus = async (req, res, next) => {
     const { status } = req.body;
 
     // Fetch application and populate job, company, and user data
-    const application = await ApplicationModel.findOne({ _id: applicationId })
+    const application = await ApplicationModel.findOne({ _id: applicationId, deletedAt: null })
         .populate({
-            path: "jobId",
-            populate: { path: "companyId", select: "createdBy HRs companyName" },
+            path: "jobId", // Populate job details
+            populate: { path: "companyId", select: "createdBy HRs companyName" }, // Populate company details
             select: "companyId jobTitle",
         })
         .populate("userId", "firstName email"); // Populate user details
@@ -246,7 +245,6 @@ export const updateApplicationStatus = async (req, res, next) => {
     }
 
     return res.status(200).json({ success: true, message: "Application updated successfully" });
-
 };
 
 

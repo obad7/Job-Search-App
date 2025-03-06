@@ -28,11 +28,12 @@ export const updateProfile = async (req, res, next) => {
 
 };
 
+
 export const getProfile = async (req, res, next) => {
 
     const user = await dbService.findOne({
         model: UserModel,
-        filter: { _id: req.user._id }
+        filter: { _id: req.user._id, deletedAt: null },
     });
     if (!user) return next(new Error("User not found", { cause: 400 }));
 
@@ -41,6 +42,7 @@ export const getProfile = async (req, res, next) => {
         data: { user },
     });
 };
+
 
 export const viewOthersProfile = async (req, res, next) => {
     const { userId } = req.params;
@@ -67,6 +69,7 @@ export const viewOthersProfile = async (req, res, next) => {
     });
 };
 
+
 export const updatePassword = async (req, res, next) => {
     const { oldPassword, password } = req.body;
 
@@ -75,7 +78,7 @@ export const updatePassword = async (req, res, next) => {
 
     const user = await dbService.findOne({
         model: UserModel,
-        filter: { _id: req.user._id },
+        filter: { _id: req.user._id, deletedAt: null },
     });
 
     // use user.save(); to trigger hashing hook
@@ -93,7 +96,7 @@ export const uploadProfilePic = async (req, res, next) => {
 
     const user = await dbService.findById({
         model: UserModel,
-        id: { _id: req.user._id },
+        id: { _id: req.user._idm },
     });
     if (!user) return next(new Error("User not found", { cause: 400 }));
 
