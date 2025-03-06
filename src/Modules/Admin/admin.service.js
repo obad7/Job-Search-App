@@ -21,3 +21,21 @@ export const ban_unban_user = async (req, res, next) => {
     return res.status(200).json({ success: true, message });
 
 };
+
+
+// Ban or unbanned specific company
+export const ban_unban_company = async (req, res, next) => {
+    const { companyId } = req.params;
+
+    const company = await dbService.findOne({ model: CompanyModel, filter: { _id: companyId } });
+    if (!company) return next(new Error("Company not found", { cause: 400 }));
+
+    // Toggle bannedAt field
+    company.bannedAt = company.bannedAt ? null : new Date();
+    await company.save();
+
+    const message = company.bannedAt
+        ? "Company banned successfully"
+        : "Company unbanned successfully";
+    return res.status(200).json({ success: true, message });
+};

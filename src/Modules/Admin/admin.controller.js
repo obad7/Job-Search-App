@@ -16,5 +16,12 @@ router.patch(
     asyncHandler(adminService.ban_unban_user),
 );
 
+router.patch(
+    "/ban_unban_company/:companyId",
+    authentication(),
+    allowTo(["Admin"]),
+    validation(adminValidation.banAndUnbanCompanySchema),
+    asyncHandler(adminService.ban_unban_company),
+);
 
 export default router;
