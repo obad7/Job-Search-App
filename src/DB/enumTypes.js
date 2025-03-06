@@ -1,4 +1,3 @@
-
 export const providersTypes = {
     System: "System",
     Google: "Google",
@@ -36,7 +35,6 @@ export const numberOfEmployeesType = [
 export const jobLocationType = ["onsite", "remotely", "hybrid"];
 export const workingTimeType = ["part-time", "full-time"];
 export const seniorityLevelType = ["fresh", "Junior", "Mid-Level", "Senior", "Team-Lead", "CTO"];
-
 
 export const applicationStatusType = {
     pending: "pending",

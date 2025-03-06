@@ -1,7 +1,13 @@
 import cron from "node-cron";
 import OTPModel from "../../DB/Models/OTP.model.js";
 
-// Function to delete expired OTPs
+/**
+ * This code defines a function deleteExpiredOTPs that deletes 
+ * OTPs (One-Time Passwords) older than 10 minutes from the database using the OTPModel. 
+ * It also schedules this function to run every 6 hours using the node-cron library, 
+ * logging a message before each run. If any errors occur during deletion, they are logged to the console.
+ */
+
 const deleteExpiredOTPs = async () => {
     try {
         const result = await OTPModel.deleteMany({

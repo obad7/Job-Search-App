@@ -9,14 +9,23 @@ import { emailEmitter } from "../../utils/emails/emailEvents.js";
 
 export const createJob = async (req, res, next) => {
     const { companyId } = req.params;
-    // Check if company exists
-    const company = await dbService.findOne({ model: CompanyModel, filter: { _id: companyId } });
+
+    const company = await dbService.findOne({
+        model: CompanyModel, filter: {
+            _id: companyId,
+            bannedAt: null,
+            deletedAt: null
+        }
+    });
     if (!company) return next(new Error("Company not found", { cause: 400 }));
 
     // Check if the user is authorized to create job
-    if (company.createdBy.toString() !== req.user._id.toString()
-        && !company.HRs.includes(req.user._id)) {
+    if (!isUserAuthorizedForCompany(company, req.user._id)) {
         return next(new Error("You are not authorized to create job for this company", { cause: 400 }));
+    }
+
+    if (company.approvedByAdmin === false) {
+        return next(new Error("Company is not approved yet", { cause: 400 }));
     }
 
     const newJob = await dbService.create({
