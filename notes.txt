@@ -10,6 +10,3 @@ Emit a socket event to notify the HR that a new application has been submitted
 
 job APIs
 - Emit a socket event to notify the HR that a new application has been submitted
-8. Accept or Reject an Applicant
-    - If the application is accepted, send an acceptance email to the applicant.
-    - If the application is rejected, send an rejection email to the applicant.
