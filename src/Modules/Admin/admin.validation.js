@@ -8,3 +8,7 @@ export const banAndUnbanUserSchema = joi.object({
 export const banAndUnbanCompanySchema = joi.object({
     companyId: generalFaileds.id.required(),
 })
+
+export const approveCompanySchema = joi.object({
+    companyId: generalFaileds.id.required(),
+})

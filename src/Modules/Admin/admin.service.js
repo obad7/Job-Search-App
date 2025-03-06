@@ -19,11 +19,9 @@ export const ban_unban_user = async (req, res, next) => {
         ? "User banned successfully"
         : "User unbanned successfully";
     return res.status(200).json({ success: true, message });
-
 };
 
 
-// Ban or unbanned specific company
 export const ban_unban_company = async (req, res, next) => {
     const { companyId } = req.params;
 
@@ -38,4 +36,23 @@ export const ban_unban_company = async (req, res, next) => {
         ? "Company banned successfully"
         : "Company unbanned successfully";
     return res.status(200).json({ success: true, message });
+};
+
+// Approve company
+export const approveCompany = async (req, res, next) => {
+    const { companyId } = req.params;
+
+    const company = await dbService.findOne({ model: CompanyModel, filter: { _id: companyId } });
+    if (!company) {
+        return res.status(400).json({ success: false, message: "Company not found" });
+    }
+
+    if (company.approvedByAdmin) {
+        return res.status(400).json({ success: false, message: "Company is already approved" });
+    }
+
+    company.approvedByAdmin = true;
+    await company.save();
+
+    return res.status(200).json({ success: true, message: "Company approved successfully" });
 };
