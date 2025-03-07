@@ -11,4 +11,6 @@ const server = app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
 
-runSocket(server);
+const io = runSocket(server); // Store io instance
+
+app.set("io", io); // Attach io to app

@@ -135,12 +135,17 @@ export const filterJobs = async (req, res, next) => {
 
 export const applyToJob = async (req, res, next) => {
     const { jobId } = req.params;
+    const io = req.app.get("io"); // Retrieve io instance
 
     // Check if job exists
-    const job = await dbService.findOne({ model: JobModel, filter: { _id: jobId, deletedAt: null } });
+    const job = await dbService.findOne({
+        model: JobModel,
+        filter: { _id: jobId, deletedAt: null },
+        populate: { path: "addedBy", select: "_id" },
+    });
     if (!job) return next(new Error("Job not found", { cause: 400 }));
 
-    // Check if user has already applied to this job
+    // Check if user has already applied
     const application = await dbService.findOne({
         model: ApplicationModel,
         filter: { userId: req.user._id, jobId, deletedAt: null },
@@ -153,7 +158,7 @@ export const applyToJob = async (req, res, next) => {
     });
 
     // Save application data
-    await dbService.create({
+    const newApplication = await dbService.create({
         model: ApplicationModel,
         data: {
             jobId: jobId,
@@ -162,8 +167,14 @@ export const applyToJob = async (req, res, next) => {
         },
     });
 
+    // Emit socket event to HR who added the job
+    io.to(job.addedBy._id.toString()).emit("newApplication", {
+        message: "A new application has been submitted!"
+    });
+
     return res.status(200).json({ success: true, message: "Applied to job successfully" });
 };
+
 
 
 export const getApplicationsRelatedToJob = async (req, res, next) => {

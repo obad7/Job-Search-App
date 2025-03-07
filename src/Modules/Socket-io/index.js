@@ -16,4 +16,5 @@ export const runSocket = (server) => {
             console.log("User disconnected");
         });
     });
+    return io;
 };
