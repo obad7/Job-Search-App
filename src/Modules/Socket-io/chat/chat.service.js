@@ -10,7 +10,11 @@ export const sendMessage = function (socket, io) {
             model: UserModel,
             filter: { _id: receiverId, deletedAt: null }
         });
-        if (!user) throw new Error("User not found");
+
+        if (!user) {
+            console.error("❌ User not found");
+            return;
+        }
 
         let chat = await dbService.findOne({
             model: ChatModel,
@@ -27,14 +31,15 @@ export const sendMessage = function (socket, io) {
             chat = await dbService.create({
                 model: ChatModel,
                 data: {
-                    senderId: socket.id, receiverId: user._id, messages: [{
-                        message, senderId: socket.id
-                    }]
+                    senderId: socket.id,
+                    receiverId: user._id,
+                    messages: [{ message, senderId: socket.id }]
                 },
             });
         }
 
         io.to(receiverId).emit("message", { message, senderId: socket.id });
-    }
-}
+    };
+};
+
 
