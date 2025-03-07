@@ -3,7 +3,7 @@ import authRouter from "./Modules/Auth/auth.controller.js";
 import userRouter from "./Modules/User/user.controller.js";
 import companyRouter from "./Modules/Company/company.controller.js";
 import jobRouter from "./Modules/Job/job.controller.js";
-import chatRouter from "./Modules/Caht/chat.controller.js";
+import chatRouter from "./Modules/Chat/chat.controller.js";
 import adminRouter from "./Modules/Admin/admin.controller.js";
 import { notFoundHandler, globalErrorHandler } from "./utils/error handling/globalErrorHandler.js";
 import cors from "cors";
