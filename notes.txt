@@ -5,7 +5,6 @@ User APIs
 
 
 Company APIs
-if approvedByAdmin is false company cant add new jobs
 Emit a socket event to notify the HR that a new application has been submitted
 
 job APIs
