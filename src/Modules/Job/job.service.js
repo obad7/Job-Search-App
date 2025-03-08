@@ -74,7 +74,8 @@ export const deleteJob = async (req, res, next) => {
         return next(new Error("You are not authorized to delete this job", { cause: 400 }));
     }
 
-    await dbService.findByIdAndDelete({ model: JobModel, id: jobId });
+    // Delete job and related applications
+    await JobModel.deleteOne({ _id: jobId });
 
     return res.status(200).json({ success: true, message: "Job deleted successfully" });
 };

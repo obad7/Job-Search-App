@@ -52,6 +52,8 @@ const jobSchema = new mongoose.Schema(
         toObject: { virtuals: true },
     }
 );
+// pagination plugin for mongoose
+jobSchema.plugin(paginationPlugin);
 
 // virtual populate
 jobSchema.virtual("company", {
@@ -87,9 +89,15 @@ jobSchema.query.paginate = async function (page) {
 
 };
 
-// pagination plugin for mongoose
-jobSchema.plugin(paginationPlugin);
+// Delete job and related applications
+jobSchema.pre("deleteOne", { document: false, query: true }, async function (next) {
+    const job = await this.model.findOne(this.getFilter());
+    if (job) {
+        const ApplicationModel = mongoose.model("Application");
+        await ApplicationModel.deleteMany({ jobId: job._id });
+    }
+    next();
+});
 
 const JobModel = mongoose.model("Job", jobSchema);
-
 export default JobModel;
