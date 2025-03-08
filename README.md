@@ -30,11 +30,18 @@ It allows users to search for jobs, apply, manage their applications, and commun
 ---
 ## Available Scripts
 
+Install dependencies
+
+```bash
+npm install
+```
+
 Runs the application in development mode using **nodemon**. The server will restart upon changes.
 
 ```bash
 npm run dev
 ```
+
 ---
 ## API Endpoints
 

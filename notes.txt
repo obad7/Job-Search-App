@@ -3,9 +3,10 @@ User APIs
 5. Login with google
 6. soft delete user
 
+You should delete any related documents in other collections using mongoose hooks when you delete any document.
 
-Company APIs
-Emit a socket event to notify the HR that a new application has been submitted
+Add an endpoint that collects the applications for a specific company on a specific day and creates an Excel sheet with this data
 
-job APIs
-- Emit a socket event to notify the HR that a new application has been submitted
+HRs
+
+Apply Rate-limit, Helmet and CORS origin

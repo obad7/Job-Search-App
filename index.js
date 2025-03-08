@@ -12,5 +12,4 @@ const server = app.listen(port, () => {
 });
 
 const io = runSocket(server); // Store io instance
-
 app.set("io", io); // Attach io to app
