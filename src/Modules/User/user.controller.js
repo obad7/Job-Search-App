@@ -69,4 +69,11 @@ router.delete(
     asyncHandler(userService.deleteCoverPic),
 );
 
+router.patch(
+    "/softDeleteProfile",
+    authentication(),
+    allowTo(["User"]),
+    asyncHandler(userService.softDeleteProfile),
+)
+
 export default router;

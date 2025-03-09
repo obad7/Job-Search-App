@@ -63,7 +63,7 @@ userSchema.pre("save", function (next) {
 });
 
 // Encrypt mobile number
-userSchema.post("findOne", function (doc) {
+userSchema.post(["findOne", "findByIdAndUpdate"], function (doc) {
     if (!doc) return;
 
     if (doc.mobileNumber) {
@@ -71,7 +71,6 @@ userSchema.post("findOne", function (doc) {
             encrypted: doc.mobileNumber,
             signature: process.env.ENCRYPTION_KEY,
         });
-        console.log(doc.mobileNumber);
     }
 });
 

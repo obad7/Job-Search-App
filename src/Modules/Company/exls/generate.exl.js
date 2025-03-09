@@ -6,6 +6,18 @@ import UserModel from "../../../DB/Models/user.model.js";
 import fs from "fs";
 import path from "path";
 
+/**
+  *  This is an Express.js route handler that exports company applications to an Excel file. Here's a succinct breakdown:
+  *  It takes a companyId from the request parameters and an optional date from the query parameters (defaulting to today's date if not provided).
+  *  It fetches all jobs belonging to the company and creates a map of job IDs to job titles.
+  *  It fetches all applications for these jobs, created on the specified date, and populates the user's first name.
+  *  If no applications are found, it returns a 404 error.
+  *  It generates an Excel file with the application data, including user first name, job title, status, created at, and CV link.
+  *  It saves the Excel file to a temporary directory and uploads it to Cloudinary.
+  *  If the upload is successful, it returns a JSON response with the URL of the uploaded file. If any errors occur during the process, it returns an error response.
+  *  In summary, this code exports company applications to an Excel file and uploads it to Cloudinary, providing a URL to access the file.
+ */
+
 export const exportCompanyApplications = async (req, res, next) => {
 
     const { companyId } = req.params;

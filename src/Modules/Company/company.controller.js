@@ -96,7 +96,7 @@ router.get(
     asyncHandler(companyService.getCompanyWithJobs),
 )
 
-
+// export company applications
 router.get(
     "/export-company-applications/:companyId",
     asyncHandler(exportCompanyApplications)

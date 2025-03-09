@@ -23,7 +23,7 @@ export const updateProfile = async (req, res, next) => {
 
     return res.status(200).json({
         success: true,
-        data: { user },
+        message: "Profile updated successfully",
     });
 
 };
@@ -174,5 +174,22 @@ export const deleteCoverPic = async (req, res, next) => {
     return res.status(200).json({
         success: true,
         message: " Cover picture deleted successfully",
+    });
+}
+
+
+export const softDeleteProfile = async (req, res, next) => {
+    const user = await dbService.findById({
+        model: UserModel,
+        id: { _id: req.user._id },
+    });
+    if (!user) return next(new Error("User not found", { cause: 400 }));
+
+    user.deletedAt = new Date();
+    await user.save();
+
+    return res.status(200).json({
+        success: true,
+        message: "User deleted successfully",
     });
 }
