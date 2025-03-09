@@ -1,4 +1,4 @@
-export const corsWhiteList = (req, res, next) => {
+const corsWhiteList = (req, res, next) => {
     const whiteList = ["http://localhost:3000", "http://localhost:3001"];
 
     const requestOrigin = req.header("origin");
@@ -13,3 +13,5 @@ export const corsWhiteList = (req, res, next) => {
 
     return next();
 };
+
+export default corsWhiteList;

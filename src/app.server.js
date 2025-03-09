@@ -6,13 +6,15 @@ import jobRouter from "./Modules/Job/job.controller.js";
 import chatRouter from "./Modules/Chat/chat.controller.js";
 import adminRouter from "./Modules/Admin/admin.controller.js";
 import { notFoundHandler, globalErrorHandler } from "./utils/error handling/globalErrorHandler.js";
-import cors from "cors";
-import { corsWhiteList } from "./Middlewares/cors.whiteList.middleware.js";
+import corsWhiteList from "./Middlewares/cors.whiteList.middleware.js";
+import limiter from "./Middlewares/rateLimiter.middleware.js";
 import "./utils/jobs/deleteExpiredOTP.js";
-
+import helmet from "helmet";
+import cors from "cors";
 // GraphQL
 import { createHandler } from "graphql-http/lib/use/express";
 import { schema } from "./Modules/app.graph.js";
+
 
 const bootstrap = async (app, express) => {
     await connectDB();
@@ -21,6 +23,8 @@ const bootstrap = async (app, express) => {
 
     app.use(cors());
     app.use(corsWhiteList);
+    app.use(limiter);
+    app.use(helmet());
 
     app.use(
         "/graphql",
