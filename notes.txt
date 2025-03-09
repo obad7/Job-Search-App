@@ -3,9 +3,8 @@ User APIs
 5. Login with google
 6. soft delete user
 
-You should delete any related documents in other collections using mongoose hooks when you delete any document.
 
-Add an endpoint that collects the applications for a specific company on a specific day and creates an Excel sheet with this data
+[Add an endpoint that collects the applications for a specific company on a specific day and creates an Excel sheet with this data]
 
 HRs
 

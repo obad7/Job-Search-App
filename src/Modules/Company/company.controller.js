@@ -6,7 +6,7 @@ import * as companyValidation from "./company.validation.js";
 import { authentication, allowTo } from "../../Middlewares/auth.middleware.js";
 import jobRouter from "../Job/job.controller.js";
 import { uploadOnCloud } from "../../utils/file uploading/multerCloud.js";
-
+import { exportCompanyApplications } from "../Company/exls/generate.exl.js";
 
 const router = Router();
 
@@ -95,5 +95,16 @@ router.get(
     validation(companyValidation.getCompanyWithJobsSchema),
     asyncHandler(companyService.getCompanyWithJobs),
 )
+
+
+router.get(
+    "/export-company-applications/:companyId",
+    asyncHandler(exportCompanyApplications)
+);
+
+
+
+
+
 
 export default router;
