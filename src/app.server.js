@@ -7,8 +7,8 @@ import chatRouter from "./Modules/Chat/chat.controller.js";
 import adminRouter from "./Modules/Admin/admin.controller.js";
 import { notFoundHandler, globalErrorHandler } from "./utils/error handling/globalErrorHandler.js";
 import cors from "cors";
+import { corsWhiteList } from "./Middlewares/cors.whiteList.middleware.js";
 import "./utils/jobs/deleteExpiredOTP.js";
-
 
 // GraphQL
 import { createHandler } from "graphql-http/lib/use/express";
@@ -18,7 +18,9 @@ const bootstrap = async (app, express) => {
     await connectDB();
 
     app.use(express.json());
+
     app.use(cors());
+    app.use(corsWhiteList);
 
     app.use(
         "/graphql",
